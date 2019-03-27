@@ -95,38 +95,6 @@ protected:
 
 };
 
-class SimpleWriterBase
-{
-private:
-	std::ifstream* m_pFile;
-	std::string m_RawHeader;
-	std::vector<std::vector<std::vector<std::string> > > m_AllData;
-	int m_iDataTitles;
-	std::string m_HeaderRepeatKey;
-	char m_Separator;
-
-	void SetHeader(std::string& str_header);
-
-public:
-	/**
-	 *
-	 * @param fileName
-	 * @param nHeaders number of data headers
-	 * @param iDataTitles which row contains the data titles
-	 * @param nVariablesForOneObject 0 means each row represents one object
-	 */
-	SimpleWriterBase(const std::string& fileName, const int& nHeaders = 2, const char& separator = ',',
-			const int& iDataTitles = 1, const int& nVariablesForOneObject = 0,
-			const int& nLineHeaders = 0, const std::string& headerRepeatKey = "...");
-
-	~SimpleWriterBase();
-
-protected:
-	int WriteAllData();
-	bool WriteSingleLine(std::vector<std::vector<std::string> >& line);
-
-};
-
 class GPSDataReader : public SimpleReaderBase
 {
 public:

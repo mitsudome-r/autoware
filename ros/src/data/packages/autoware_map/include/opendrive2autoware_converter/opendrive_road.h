@@ -46,16 +46,16 @@ public:
 
 	FromRoadLink(TiXmlElement* main_element)
 	{
-		if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
+		if(XmlHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
 			link_type = ROAD_LINK;
 		else
 			link_type = JUNCTION_LINK;
 
-		from_road_id = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "elementId", 0);
+		from_road_id = XmlHelpers::GetIntAttribute(main_element, "elementId", 0);
 
-		if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
+		if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
 			contact_point = START_POINT;
-		else if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
+		else if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
 			contact_point = END_POINT;
 		else
 			contact_point = EMPTY_POINT;
@@ -71,16 +71,16 @@ public:
 
 	ToRoadLink(TiXmlElement* main_element)
 	{
-		if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
+		if(XmlHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
 			link_type = ROAD_LINK;
 		else
 			link_type = JUNCTION_LINK;
 
-		to_road_id = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "elementId", 0);
+		to_road_id = XmlHelpers::GetIntAttribute(main_element, "elementId", 0);
 
-		if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
+		if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
 			contact_point = START_POINT;
-		else if(PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
+		else if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
 			contact_point = END_POINT;
 		else
 			contact_point = EMPTY_POINT;
@@ -116,6 +116,8 @@ public:
 	void GetTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
 	void GetTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
 	void GetStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
+	void InsertUniqueToConnection(const Connection& _connection);
+	void InsertUniqueFromConnection(const Connection& _connection);
 
 	OpenDriveRoad()
 	{
@@ -205,6 +207,8 @@ private:
 
 	void InsertUniqueFromRoadIds(const int& curr_section_id, const int& curr_lane_id, PlannerHNS::Lane& _l);
 	void InsertUniqueToRoadIds(const int& curr_section_id, const int& curr_lane_id, PlannerHNS::Lane& _l);
+
+
 
 
 	void CreateRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list);

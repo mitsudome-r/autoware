@@ -461,7 +461,7 @@ void ROSHelpers::ConvertFromPlannerHToAutowarePathFormat(const std::vector<Plann
 	}
 }
 
-void ROSHelpers::ConvertFromRoadNetworkToAutowareVisualizeMapFormat(const PlannerHNS::RoadNetwork& map,	visualization_msgs::MarkerArray& markerArray, int color)
+void ROSHelpers::ConvertFromRoadNetworkToAutowareVisualizeMapFormat(const PlannerHNS::RoadNetwork& map,	visualization_msgs::MarkerArray& markerArray)
 {
 	visualization_msgs::Marker lane_waypoint_marker;
 	lane_waypoint_marker.header.frame_id = "map";
@@ -471,35 +471,10 @@ void ROSHelpers::ConvertFromRoadNetworkToAutowareVisualizeMapFormat(const Planne
 	lane_waypoint_marker.action = visualization_msgs::Marker::ADD;
 	lane_waypoint_marker.scale.x = 0.25;
 	std_msgs::ColorRGBA roll_color, total_color, curr_color;
-	if(color == 0)
-	{
-		roll_color.r = 1;
-		roll_color.g = 1;
-		roll_color.b = 1;
-		roll_color.a = 0.5;
-	}
-	else if (color == 1)
-	{
-		roll_color.r = 1;
-		roll_color.g = 0;
-		roll_color.b = 0;
-		roll_color.a = 0.8;
-	}
-	else if(color == 2)
-	{
-		roll_color.r = 0;
-		roll_color.g = 1;
-		roll_color.b = 0;
-		roll_color.a = 0.8;
-	}
-	else if(color == 3)
-	{
-		roll_color.r = 0;
-		roll_color.g = 0;
-		roll_color.b = 1;
-		roll_color.a = 0.8;
-	}
-
+	roll_color.r = 1;
+	roll_color.g = 1;
+	roll_color.b = 1;
+	roll_color.a = 0.5;
 
 	lane_waypoint_marker.color = roll_color;
 	lane_waypoint_marker.frame_locked = false;

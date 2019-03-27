@@ -31,12 +31,12 @@
 #ifndef OPENDRIVE_OBJECTS
 #define OPENDRIVE_OBJECTS
 
-#include "op_planner/internal_road_network.h"
 #include "op_planner/MappingHelpers.h"
 #include "tinyxml.h"
 #include "time.h"
 #include "opendrive2autoware_converter/odrSpiral.h"
 #include "op_planner/MatrixOperations.h"
+#include "opendrive2autoware_converter/xml_helpers.h"
 
 namespace autoware_map
 {
@@ -53,6 +53,10 @@ enum SIGNAL_TYPE{TRAFFIC_LIGHT_1 = 1000001, TRAFFIC_LIGHT_2 = 1000002, TRAFFIC_L
 enum SIGNAL_SUBTYPE{};
 enum ORIENTATION_TYPE{SAME_DIRECTION, OPPOSIT_DIRECTION, BOTH_DIRECTIONS};
 enum ROAD_OBJECT_TYPE{PARKING_SPACE_OBJ, UNKNOWN_ROAD_OBJ};
+enum LANE_TYPE { NONE_LANE, DRIVING_LANE, STOP_LANE, SHOULDER_LANE, BIKING_LANE,
+	SIDEWALK_LANE, BORDER_LANE, RESTRICTED_LANE, PARKING_LANE, BIDIRECTIONAL_LANE,
+    MEDIAN_LANE, SPECIAL1_LANE, SPECIAL2_LANE, SPECIAL3_LANE, ROADWORKS_LANE,
+    TRAM_LANE, RAIL_LANE, ENTRY_LANE, EXIT_LANE, OFFRAMP_LANE, ONRAMP_LANE, PLANE_LANE};
 
 
 class OpenDriveHeader
@@ -162,11 +166,11 @@ public:
 	double sOffset, a, b, c, d;
 	LaneWidth(TiXmlElement* main_element)
 	{
-		sOffset = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "sOffset", 0);
-		a = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "a", 0);
-		b = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "b", 0);
-		c = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "c", 0);
-		d = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "d", 0);
+		sOffset = XmlHelpers::GetDoubleAttribute(main_element, "sOffset", 0);
+		a = XmlHelpers::GetDoubleAttribute(main_element, "a", 0);
+		b = XmlHelpers::GetDoubleAttribute(main_element, "b", 0);
+		c = XmlHelpers::GetDoubleAttribute(main_element, "c", 0);
+		d = XmlHelpers::GetDoubleAttribute(main_element, "d", 0);
 	}
 };
 
@@ -181,11 +185,11 @@ public:
 
 	RoadMark(TiXmlElement* main_element)
 	{
-		sOffset = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "sOffset", 0);
-		width = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "width", 0);
-		weight = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "weight", "");
-		color = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "color", "");
-		std::string str_type = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "type", "");
+		sOffset = XmlHelpers::GetDoubleAttribute(main_element, "sOffset", 0);
+		width = XmlHelpers::GetDoubleAttribute(main_element, "width", 0);
+		weight = XmlHelpers::GetStringAttribute(main_element, "weight", "");
+		color = XmlHelpers::GetStringAttribute(main_element, "color", "");
+		std::string str_type = XmlHelpers::GetStringAttribute(main_element, "type", "");
 
 		if(str_type.compare("broken")==0)
 		{
@@ -213,11 +217,11 @@ public:
 	double s, a, b, c, d;
 	LaneOffset(TiXmlElement* main_element)
 	{
-		s = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		a = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "a", 0);
-		b = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "b", 0);
-		c = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "c", 0);
-		d = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "d", 0);
+		s = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		a = XmlHelpers::GetDoubleAttribute(main_element, "a", 0);
+		b = XmlHelpers::GetDoubleAttribute(main_element, "b", 0);
+		c = XmlHelpers::GetDoubleAttribute(main_element, "c", 0);
+		d = XmlHelpers::GetDoubleAttribute(main_element, "d", 0);
 	}
 
 	double GetOffset(const double _s)
@@ -237,7 +241,7 @@ public:
 	ELEVATION_TYPE type;
 	Elevation(TiXmlElement* main_element)
 	{
-		std::string val = PlannerHNS::MappingHelpers::GetStringValue(main_element, "");
+		std::string val = XmlHelpers::GetStringValue(main_element, "");
 		if(val.compare("elevation") == 0)
 		{
 			type = ELEVATION_PROFILE;
@@ -247,11 +251,11 @@ public:
 			type = LATERAL_PROFILE;
 		}
 
-		s = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		a = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "a", 0);
-		b = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "b", 0);
-		c = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "c", 0);
-		d = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "d", 0);
+		s = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		a = XmlHelpers::GetDoubleAttribute(main_element, "a", 0);
+		b = XmlHelpers::GetDoubleAttribute(main_element, "b", 0);
+		c = XmlHelpers::GetDoubleAttribute(main_element, "c", 0);
+		d = XmlHelpers::GetDoubleAttribute(main_element, "d", 0);
 	}
 
 	double GetHeigh(const double _s)
@@ -285,19 +289,19 @@ public:
 	Connection(TiXmlElement* main_element)
 	{
 		incoming_section_ = -1;
-		id_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
-		incoming_road_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "incomingRoad", 0);
-		outgoing_road_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "connectingRoad", 0);
-		contact_point_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "contactPoint", "");
+		id_ = XmlHelpers::GetIntAttribute(main_element, "id", 0);
+		incoming_road_ = XmlHelpers::GetIntAttribute(main_element, "incomingRoad", 0);
+		outgoing_road_ = XmlHelpers::GetIntAttribute(main_element, "connectingRoad", 0);
+		contact_point_ = XmlHelpers::GetStringAttribute(main_element, "contactPoint", "");
 
 		std::vector<TiXmlElement*> elements;
 		if(main_element != nullptr)
 		{
-			PlannerHNS::MappingHelpers::FindElements("laneLink", main_element->FirstChildElement(), elements);
+			XmlHelpers::FindElements("laneLink", main_element->FirstChildElement(), elements);
 			for(unsigned int i=0; i < elements.size(); i++)
 			{
-				int from_id = PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "from", 0);
-				int to_id =  PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "to", 0);
+				int from_id = XmlHelpers::GetIntAttribute(elements.at(i), "from", 0);
+				int to_id =  XmlHelpers::GetIntAttribute(elements.at(i), "to", 0);
 				lane_links.push_back(std::make_pair(from_id, to_id));
 			}
 		}
@@ -336,12 +340,12 @@ public:
 
 	Junction(TiXmlElement* main_element)
 	{
-		name_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "name", "");
-		id_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
+		name_ = XmlHelpers::GetStringAttribute(main_element, "name", "");
+		id_ = XmlHelpers::GetIntAttribute(main_element, "id", 0);
 		std::vector<TiXmlElement*> elements;
 		if(main_element != nullptr)
 		{
-			PlannerHNS::MappingHelpers::FindElements("connection", main_element->FirstChildElement(), elements);
+			XmlHelpers::FindElements("connection", main_element->FirstChildElement(), elements);
 			for(unsigned int i=0; i < elements.size(); i++)
 			{
 				connections_.push_back(Connection(elements.at(i)));
@@ -367,16 +371,16 @@ public:
 		curvature = 0;
 		curveStart = 0;
 		curveEnd = 0;
-		s = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		x = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "x", 0);
-		y = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "y", 0);
-		heading = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "hdg", 0);
-		length = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "length", 0);
+		s = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		x = XmlHelpers::GetDoubleAttribute(main_element, "x", 0);
+		y = XmlHelpers::GetDoubleAttribute(main_element, "y", 0);
+		heading = XmlHelpers::GetDoubleAttribute(main_element, "hdg", 0);
+		length = XmlHelpers::GetDoubleAttribute(main_element, "length", 0);
 
 		if(main_element != nullptr)
 		{
 			TiXmlElement* type_element = main_element->FirstChildElement();
-			std::string val = PlannerHNS::MappingHelpers::GetStringValue(type_element, "");
+			std::string val = XmlHelpers::GetStringValue(type_element, "");
 			if(val.compare("line") == 0)
 			{
 				type = LINE_GEOMETRY;
@@ -384,13 +388,13 @@ public:
 			else if(val.compare("arc") == 0)
 			{
 				type = ARC_GEOMETRY;
-				curvature = PlannerHNS::MappingHelpers::GetDoubleAttribute(type_element, "curvature", 0);
+				curvature = XmlHelpers::GetDoubleAttribute(type_element, "curvature", 0);
 			}
 			else if(val.compare("spiral") == 0)
 			{
 				type = SPIRAL_GEOMETRY;
-				curveStart = PlannerHNS::MappingHelpers::GetDoubleAttribute(type_element, "curvStart", 0);
-				curveEnd = PlannerHNS::MappingHelpers::GetDoubleAttribute(type_element, "curvEnd", 0);
+				curveStart = XmlHelpers::GetDoubleAttribute(type_element, "curvStart", 0);
+				curveEnd = XmlHelpers::GetDoubleAttribute(type_element, "curvEnd", 0);
 			}
 			else if(val.compare("poly3") == 0)
 			{
@@ -472,7 +476,7 @@ public:
 	int from_lane_id;
 	FromLaneLink(TiXmlElement* main_element)
 	{
-		from_lane_id = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
+		from_lane_id = XmlHelpers::GetIntAttribute(main_element, "id", 0);
 	}
 };
 
@@ -482,7 +486,7 @@ public:
 	int to_lane_id;
 	ToLaneLink(TiXmlElement* main_element)
 	{
-		to_lane_id = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
+		to_lane_id = XmlHelpers::GetIntAttribute(main_element, "id", 0);
 	}
 };
 
@@ -506,9 +510,9 @@ public:
 	{
 		dir = _dir;
 		type = DRIVING_LANE;
-		id = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
-		level = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "level", 0);
-		std::string str_type = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "type", "");
+		id = XmlHelpers::GetIntAttribute(main_element, "id", 0);
+		level = XmlHelpers::GetIntAttribute(main_element, "level", 0);
+		std::string str_type = XmlHelpers::GetStringAttribute(main_element, "type", "");
 
 		if(str_type.compare("driving")==0)
 			type = DRIVING_LANE;
@@ -528,18 +532,18 @@ public:
 //		}
 
 		std::vector<TiXmlElement*> elements;
-		PlannerHNS::MappingHelpers::FindFirstElement("link", main_element, elements);
+		XmlHelpers::FindFirstElement("link", main_element, elements);
 		if(elements.size() > 0)
 		{
 			std::vector<TiXmlElement*> pred_elements, succ_elements;
 
-			PlannerHNS::MappingHelpers::FindElements("predecessor", elements.at(0)->FirstChildElement(), pred_elements);
+			XmlHelpers::FindElements("predecessor", elements.at(0)->FirstChildElement(), pred_elements);
 			for(unsigned int j=0; j < pred_elements.size(); j++)
 			{
 				from_lane_.push_back(FromLaneLink(pred_elements.at(j)));
 			}
 
-			PlannerHNS::MappingHelpers::FindElements("successor", elements.at(0)->FirstChildElement(), succ_elements);
+			XmlHelpers::FindElements("successor", elements.at(0)->FirstChildElement(), succ_elements);
 			for(unsigned int j=0; j < succ_elements.size(); j++)
 			{
 				to_lane_.push_back(ToLaneLink(succ_elements.at(j)));
@@ -549,7 +553,7 @@ public:
 		std::vector<TiXmlElement*> width_elements;
 		if(main_element != nullptr)
 		{
-			PlannerHNS::MappingHelpers::FindElements("width", main_element->FirstChildElement(), width_elements);
+			XmlHelpers::FindElements("width", main_element->FirstChildElement(), width_elements);
 			for(unsigned int i=0; i < width_elements.size(); i++)
 			{
 				width_list.push_back(LaneWidth(width_elements.at(i)));
@@ -630,11 +634,11 @@ public:
 		std::vector<TiXmlElement*> lane_elements;
 
 		sub_elements.clear();
-		PlannerHNS::MappingHelpers::FindFirstElement("left", main_element, sub_elements);
+		XmlHelpers::FindFirstElement("left", main_element, sub_elements);
 		if(sub_elements.size() > 0)
 		{
 			lane_elements.clear();
-			PlannerHNS::MappingHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
+			XmlHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
 			for(unsigned int k=0; k < lane_elements.size(); k++)
 			{
 				left_lanes_.push_back(OpenDriveLane(lane_elements.at(k), LEFT_LANE, s_offset, section_length, section_index));
@@ -642,11 +646,11 @@ public:
 		}
 
 		sub_elements.clear();
-		PlannerHNS::MappingHelpers::FindFirstElement("center", main_element, sub_elements);
+		XmlHelpers::FindFirstElement("center", main_element, sub_elements);
 		if(sub_elements.size() > 0)
 		{
 			lane_elements.clear();
-			PlannerHNS::MappingHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
+			XmlHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
 			for(unsigned int k=0; k < lane_elements.size(); k++)
 			{
 				center_lane_.push_back(OpenDriveLane(lane_elements.at(k), CENTER_LANE, s_offset, section_length, section_index));
@@ -654,11 +658,11 @@ public:
 		}
 
 		sub_elements.clear();
-		PlannerHNS::MappingHelpers::FindFirstElement("right", main_element, sub_elements);
+		XmlHelpers::FindFirstElement("right", main_element, sub_elements);
 		if(sub_elements.size() > 0)
 		{
 			lane_elements.clear();
-			PlannerHNS::MappingHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
+			XmlHelpers::FindElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
 			for(unsigned int k=0; k < lane_elements.size(); k++)
 			{
 				right_lanes_.push_back(OpenDriveLane(lane_elements.at(k), RIGHT_LANE, s_offset, section_length, section_index));
@@ -720,38 +724,38 @@ public:
 		orientation_ = BOTH_DIRECTIONS;
 		type_ = UNKNOWN_SIGNAL;
 
-		s_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		t_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "t", 0);
-		id_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
+		s_ = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		t_ = XmlHelpers::GetDoubleAttribute(main_element, "t", 0);
+		id_ = XmlHelpers::GetIntAttribute(main_element, "id", 0);
 
-		name_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "name", "");
-		text_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "text", "");
-		unit_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "unit", "");
-		country_code_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "country", "");
+		name_ = XmlHelpers::GetStringAttribute(main_element, "name", "");
+		text_ = XmlHelpers::GetStringAttribute(main_element, "text", "");
+		unit_ = XmlHelpers::GetStringAttribute(main_element, "unit", "");
+		country_code_ = XmlHelpers::GetStringAttribute(main_element, "country", "");
 
-		zOffset_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "zOffset", 0);
-		value_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "value", 0);
-		h_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "height", 0);
-		w_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "width", 0);
-		yaw_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "hOffset", 0);
-		roll_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "roll", 0);
-		pitch_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "pitch", 0);
+		zOffset_ = XmlHelpers::GetDoubleAttribute(main_element, "zOffset", 0);
+		value_ = XmlHelpers::GetDoubleAttribute(main_element, "value", 0);
+		h_ = XmlHelpers::GetDoubleAttribute(main_element, "height", 0);
+		w_ = XmlHelpers::GetDoubleAttribute(main_element, "width", 0);
+		yaw_ = XmlHelpers::GetDoubleAttribute(main_element, "hOffset", 0);
+		roll_ = XmlHelpers::GetDoubleAttribute(main_element, "roll", 0);
+		pitch_ = XmlHelpers::GetDoubleAttribute(main_element, "pitch", 0);
 
-		std::string dynamic_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "dynamic", "");
+		std::string dynamic_str = XmlHelpers::GetStringAttribute(main_element, "dynamic", "");
 		if(dynamic_str.compare("yes")==0)
 			dynamic_ = true;
 		else
 			dynamic_ = false;
 
-		std::string orientation_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "orientation", "");
+		std::string orientation_str = XmlHelpers::GetStringAttribute(main_element, "orientation", "");
 		if(orientation_str.compare("+")==0)
 			orientation_ = SAME_DIRECTION;
 		else if(orientation_str.compare("-")==0)
 			orientation_ = OPPOSIT_DIRECTION;
 
-		sub_type_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "subtype", 0);
+		sub_type_ = XmlHelpers::GetIntAttribute(main_element, "subtype", 0);
 
-		std::string type_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "type", "");
+		std::string type_str = XmlHelpers::GetStringAttribute(main_element, "type", "");
 		if(type_str.compare("294")==0)
 			type_ = STOP_LINE_SIGNAL;
 		else if(type_str.compare("341")==0)
@@ -767,13 +771,13 @@ public:
 		{
 			std::vector<TiXmlElement*> elements;
 			elements.clear();
-			PlannerHNS::MappingHelpers::FindElements("validity", main_element->FirstChildElement(), elements);
+			XmlHelpers::FindElements("validity", main_element->FirstChildElement(), elements);
 			for(unsigned int i=0; i < elements.size(); i++)
 			{
-				int _from_lane = PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "fromLane", 0);
-				int _to_lane = PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "toLane", 0);
+				int _from_lane = XmlHelpers::GetIntAttribute(elements.at(i), "fromLane", 0);
+				int _to_lane = XmlHelpers::GetIntAttribute(elements.at(i), "toLane", 0);
 
-				for(unsigned int k=_from_lane; k < _to_lane; k++)
+				for(int k=_from_lane; k < _to_lane; k++)
 				{
 					valid_lanes_ids_.push_back(k);
 				}
@@ -795,10 +799,10 @@ public:
 
 	SignalRef(TiXmlElement* main_element)
 	{
-		s_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		t_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "t", 0);
-		id_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
-		std::string orientation_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "orientation", "");
+		s_ = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		t_ = XmlHelpers::GetDoubleAttribute(main_element, "t", 0);
+		id_ = XmlHelpers::GetIntAttribute(main_element, "id", 0);
+		std::string orientation_str = XmlHelpers::GetStringAttribute(main_element, "orientation", "");
 		if(orientation_str.compare("+")==0)
 			orientation_ = SAME_DIRECTION;
 		else if(orientation_str.compare("-")==0)
@@ -808,13 +812,13 @@ public:
 		{
 			std::vector<TiXmlElement*> elements;
 			elements.clear();
-			PlannerHNS::MappingHelpers::FindElements("validity", main_element->FirstChildElement(), elements);
+			XmlHelpers::FindElements("validity", main_element->FirstChildElement(), elements);
 			for(unsigned int i=0; i < elements.size(); i++)
 			{
-				int _from_lane = PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "fromLane", 0);
-				int _to_lane = PlannerHNS::MappingHelpers::GetIntAttribute(elements.at(i), "toLane", 0);
+				int _from_lane = XmlHelpers::GetIntAttribute(elements.at(i), "fromLane", 0);
+				int _to_lane = XmlHelpers::GetIntAttribute(elements.at(i), "toLane", 0);
 
-				for(unsigned int k=_from_lane; k < _to_lane; k++)
+				for(int k=_from_lane; k < _to_lane; k++)
 				{
 					valid_lanes_ids_.push_back(k);
 				}
@@ -848,30 +852,30 @@ public:
 		orientation_ = BOTH_DIRECTIONS;
 		type_ = UNKNOWN_ROAD_OBJ;
 
-		s_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "s", 0);
-		t_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "t", 0);
-		id_ = PlannerHNS::MappingHelpers::GetIntAttribute(main_element, "id", 0);
-		name_ = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "name", "");
+		s_ = XmlHelpers::GetDoubleAttribute(main_element, "s", 0);
+		t_ = XmlHelpers::GetDoubleAttribute(main_element, "t", 0);
+		id_ = XmlHelpers::GetIntAttribute(main_element, "id", 0);
+		name_ = XmlHelpers::GetStringAttribute(main_element, "name", "");
 
-		validation_length_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "validLength", 0);
+		validation_length_ = XmlHelpers::GetDoubleAttribute(main_element, "validLength", 0);
 
-		zOffset_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "zOffset", 0);
-		h_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "height", 0);
-		w_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "width", 0);
-		l_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "length", 0);
-		r_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "radius", 0);
+		zOffset_ = XmlHelpers::GetDoubleAttribute(main_element, "zOffset", 0);
+		h_ = XmlHelpers::GetDoubleAttribute(main_element, "height", 0);
+		w_ = XmlHelpers::GetDoubleAttribute(main_element, "width", 0);
+		l_ = XmlHelpers::GetDoubleAttribute(main_element, "length", 0);
+		r_ = XmlHelpers::GetDoubleAttribute(main_element, "radius", 0);
 
-		yaw_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "hdg", 0);
-		roll_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "roll", 0);
-		pitch_ = PlannerHNS::MappingHelpers::GetDoubleAttribute(main_element, "pitch", 0);
+		yaw_ = XmlHelpers::GetDoubleAttribute(main_element, "hdg", 0);
+		roll_ = XmlHelpers::GetDoubleAttribute(main_element, "roll", 0);
+		pitch_ = XmlHelpers::GetDoubleAttribute(main_element, "pitch", 0);
 
-		std::string orientation_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "orientation", "");
+		std::string orientation_str = XmlHelpers::GetStringAttribute(main_element, "orientation", "");
 		if(orientation_str.compare("+")==0)
 			orientation_ = SAME_DIRECTION;
 		else if(orientation_str.compare("-")==0)
 			orientation_ = OPPOSIT_DIRECTION;
 
-		std::string type_str = PlannerHNS::MappingHelpers::GetStringAttribute(main_element, "type", "");
+		std::string type_str = XmlHelpers::GetStringAttribute(main_element, "type", "");
 		if(type_str.compare("parkingSpace")==0)
 			type_ = PARKING_SPACE_OBJ;
 	}

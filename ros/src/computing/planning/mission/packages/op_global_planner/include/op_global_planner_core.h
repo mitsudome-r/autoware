@@ -124,7 +124,6 @@ protected:
 	ros::NodeHandle nh;
 
 	ros::Publisher pub_MapRviz;
-	ros::Publisher pub_MapRvizII;
 	ros::Publisher pub_Paths;
 	ros::Publisher pub_PathsRviz;
 	ros::Publisher pub_TrafficInfo;

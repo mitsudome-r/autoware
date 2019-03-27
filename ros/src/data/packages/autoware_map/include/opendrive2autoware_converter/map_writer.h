@@ -28,33 +28,41 @@
  *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef OPENDRIVE2AUTOWARE_CONVERTER
-#define OPENDRIVE2AUTOWARE_CONVERTER
+#ifndef OPENDRIVE2OP_CONVERTER
+#define OPENDRIVE2OP_CONVERTER
 
-#include "opendrive_road.h"
+#include "opendrive2autoware_converter/opendrive_road.h"
 
 namespace autoware_map
 {
-class OpenDrive2AutoConv
+class MapWriter
 {
 
 public:
-	OpenDrive2AutoConv();
-    ~OpenDrive2AutoConv();
-    void loadOpenDRIVE(const std::string& xodr_file, autoware_map::InternalRoadNet& map);
-    void GetMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, const double& resolution = 0.5);
-    void GetTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
-    void GetTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
-    void GetStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
-    void ConnectRoads();
+	MapWriter();
+    ~MapWriter();
+    void writeAutowareMap(const std::string& folder_name, PlannerHNS::RoadNetwork& map);
+
 
 private:
-    std::vector<OpenDriveRoad> roads_list_;
-    std::vector<Junction> junctions_list_;
 
+	template <class T>
+	void WriteCSVFile(const std::string& folder, const std::string& title, const std::string& header, const std::vector<T>& data_list);
+	PlannerHNS::Lane* GetLaneFromID(PlannerHNS::RoadNetwork& map, int _l_id)
+	{
+		for(unsigned int i=0; i<map.roadSegments.size(); i++)
+		{
+			for(unsigned int j=0; j<map.roadSegments.at(i).Lanes.size(); j++)
+			{
+				if(map.roadSegments.at(i).Lanes.at(j).points.size() > 0 &&  map.roadSegments.at(i).Lanes.at(j).id == _l_id)
+				{
+					return &map.roadSegments.at(i).Lanes.at(j);
+				}
+			}
+		}
 
-    OpenDriveRoad* GetRoadById(const int& _id);
-    Junction* GetJunctionById(const int& _id);
+		return nullptr;
+	}
 };
 
 }

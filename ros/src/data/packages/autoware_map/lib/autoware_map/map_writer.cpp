@@ -164,6 +164,7 @@ void MapWriter::writeAutowareMap(const std::string& folder_name, PlannerHNS::Roa
 			autoware_map_msgs::WaypointLaneRelation wplr;
 			wplr.waypoint_id = wp.waypoint_id;
 			wplr.lane_id = l.lane_id;
+			wplr.order = j;
 			wp_lanes_relations_list.data.push_back(wplr);
 		}
 	}

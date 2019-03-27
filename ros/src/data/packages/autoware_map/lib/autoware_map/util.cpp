@@ -169,7 +169,8 @@ std::ostream& operator<<(std::ostream& os, const autoware_map_msgs::Waypoint& ob
 std::ostream& operator<<(std::ostream& os, const autoware_map_msgs::WaypointLaneRelation& obj)
 {
     os << obj.waypoint_id << ","
-    << obj.lane_id;
+    << obj.lane_id << ","
+    << obj.order;
     return os;
 }
 std::ostream& operator<<(std::ostream& os, const autoware_map_msgs::WaypointRelation& obj)

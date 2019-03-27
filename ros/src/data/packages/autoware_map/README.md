@@ -1,5 +1,11 @@
 # autoware_map package
 
+## opendrive2autoware_converter
+### How to use: 
+```
+rosrun autoware_map opendrive2autoware_converter ../sample1.1.xodr ../sample1.1_autoware_format/
+```
+
 ## autoware2vectormap_converter
 ### Feature
 converts autoware_map_msgs to vector_map_msgs

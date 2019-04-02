@@ -2052,7 +2052,14 @@ params :
       cmd_param :
         dash      : ''
         delim     : ':='
-
+    - name  : stopline_manual_clear
+      desc  : The state transits from Stop to Go only if "clear" state_cmd is pulished from other nodes.
+      label : stopline_manual_clear
+      kind  : checkbox
+      v     : False
+      cmd_param :
+        dash      : ''
+        delim     : ':='
 
   - name  : car_kf
     topic : /config/car_kf

@@ -345,16 +345,24 @@ void DecisionMakerNode::updateStoplineState(cstring_t& state_name, int status)
 
   if (current_status_.velocity == 0.0 && !timerflag && (current_status_.obstacle_waypoint + current_status_.closest_waypoint) == current_status_.found_stopsign_idx)
   {
-    stopping_timer = nh_.createTimer(ros::Duration(0.5),
-                                     [&](const ros::TimerEvent&) {
-                                       timerflag = false;
-                                       current_status_.prev_stopped_wpidx = current_status_.found_stopsign_idx;
-                                       tryNextState("clear");
-                                       /*if found risk,
-                                        * tryNextState("found_risk");*/
-                                     },
-                                     this, true);
-    timerflag = true;
+    if( stopline_manual_clear_ )
+    {
+      current_status_.prev_stopped_wpidx = current_status_.found_stopsign_idx;
+    }
+    else
+    {
+      stopping_timer = nh_.createTimer(ros::Duration(0.5),
+      [&](const ros::TimerEvent&) {
+        timerflag = false;
+        current_status_.prev_stopped_wpidx = current_status_.found_stopsign_idx;
+        tryNextState("clear");
+        /*if found risk,
+        * tryNextState("found_risk");*/
+      },
+      this, true);
+      timerflag = true;
+    }
+
   }
 }
 void DecisionMakerNode::exitStopState(cstring_t& state_name, int status)

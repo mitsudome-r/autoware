@@ -148,6 +148,7 @@ private:
   bool auto_mission_change_;
   bool use_fms_;
   bool disuse_vector_map_;
+  bool stopline_manual_clear_;
   int param_num_of_steer_behind_;
   double change_threshold_dist_;
   double change_threshold_angle_;
@@ -331,6 +332,7 @@ public:
     , auto_mission_change_(false)
     , use_fms_(false)
     , disuse_vector_map_(false)
+    , stopline_manual_clear_(false)
     , param_num_of_steer_behind_(30)
     , change_threshold_dist_(1.0)
     , change_threshold_angle_(15)
@@ -362,6 +364,7 @@ public:
     private_nh_.getParam("goal_threshold_dist", goal_threshold_dist_);
     private_nh_.getParam("goal_threshold_vel", goal_threshold_vel_);
     private_nh_.getParam("stopline_reset_count", stopline_reset_count_);
+    private_nh_.getParam("stopline_manual_clear", stopline_manual_clear_);
     current_status_.prev_stopped_wpidx = -1;
   }
 

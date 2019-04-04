@@ -16,7 +16,7 @@
 
 #include "g30esli_ros.h"
 
-G30esliROS::G30esliROS() : alive_(0)
+G30esliROS::G30esliROS() : alive_(0), stop_state_(true), stop_duration_secs_(0.6)
 {
 }
 
@@ -29,8 +29,8 @@ bool G30esliROS::openDevice(const std::string& device)
   return g30esli_.openDevice(device);
 }
 
-void G30esliROS::updateCommand(const autoware_msgs::VehicleCmd& msg, const bool& engage,
-                               const double& steering_offset_deg)
+void G30esliROS::updateAutoCommand(const autoware_msgs::VehicleCmd& msg, const bool& engage,
+                                   const double& steering_offset_deg, const double& brake_threshold)
 {
   Command& cmd = commands_[(int)MODE::AUTO];
 
@@ -39,7 +39,7 @@ void G30esliROS::updateCommand(const autoware_msgs::VehicleCmd& msg, const bool&
 
   // speed
   double speed_kmph = msg.ctrl_cmd.linear_velocity * 3.6;  // [m/s] -> [km/h]
-  cmd.command.speed = engage ? speed_kmph : 0.0;
+  cmd.command.speed = (engage && !stop_state_) ? speed_kmph : 0.0;
 
   // steer
   double steering_angle_deg = msg.ctrl_cmd.steering_angle / M_PI * 180.0;  // [rad] -> [deg]
@@ -49,7 +49,18 @@ void G30esliROS::updateCommand(const autoware_msgs::VehicleCmd& msg, const bool&
   cmd.command.mode = engage ? G30ESLI_MODE_AUTO : G30ESLI_MODE_MANUAL;
 
   // brake
-  cmd.command.brake = (msg.emergency == 1) ? G30ESLI_BRAKE_SEMIEMG : G30ESLI_BRAKE_NONE;
+  if (msg.emergency == 1)
+  {
+    cmd.command.brake = G30ESLI_BRAKE_SEMIEMG;
+  }
+  else if (cmd.command.speed < brake_threshold)
+  {
+    cmd.command.brake = G30ESLI_BRAKE_SMOOTH;
+  }
+  else
+  {
+    cmd.command.brake = G30ESLI_BRAKE_NONE;
+  }
 
   // shift
   if (msg.gear == 1)
@@ -84,7 +95,7 @@ void G30esliROS::updateCommand(const autoware_msgs::VehicleCmd& msg, const bool&
   }
 }
 
-void G30esliROS::updateCommand(const ds4_msgs::DS4& msg, const bool& engage, const double& steering_offset_deg)
+void G30esliROS::updateJoystickCommand(const ds4_msgs::DS4& msg, const bool& engage, const double& steering_offset_deg)
 {
   Command& cmd = commands_[(int)MODE::JOYSTICK];
 
@@ -253,6 +264,25 @@ void G30esliROS::updateAliveCounter()
   alive_++;
   commands_[(int)MODE::AUTO].command.alive = alive_;
   commands_[(int)MODE::JOYSTICK].command.alive = alive_;
+}
+
+void G30esliROS::updateState()
+{
+  static double prev_speed = DBL_MAX;
+  const bool is_const_velocity = (fabs(vehicle_status_.speed - prev_speed) == 0.0);
+  const bool is_stop_starting = !is_const_velocity && (vehicle_status_.speed == 0.0);
+  static ros::Time prev = ros::Time::now();
+  if (is_stop_starting)
+  {
+    prev = ros::Time::now();
+    stop_state_ = true;
+  }
+  ros::Duration stop_duration = ros::Time::now() - prev;
+  if (stop_state_ && (stop_duration.toSec() > stop_duration_secs_))
+  {
+    stop_state_ = false;
+  }
+  prev_speed = vehicle_status_.speed;
 }
 
 std::string G30esliROS::dumpDebug(const MODE& mode)

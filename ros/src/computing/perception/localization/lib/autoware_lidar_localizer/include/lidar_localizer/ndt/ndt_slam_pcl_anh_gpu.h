@@ -20,12 +20,21 @@
 #ifndef CUDA_FOUND
 
 #include "lidar_localizer/ndt/ndt_slam_dummy.h"
+#include <pcl/io/io.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
 
 template <class PointSource, class PointTarget>
 class NdtSlamPCLANHGPU : public NdtSlamDummy<PointSource, PointTarget> {
 public:
   NdtSlamPCLANHGPU();
   ~NdtSlamPCLANHGPU() = default;
+  void swapInstance(){};
+  void buildMap(const boost::shared_ptr<pcl::PointCloud<PointTarget>> &map_ptr){};
+  void align(const Pose &predict_pose){};
+  void setInputTarget(const boost::shared_ptr<pcl::PointCloud<PointTarget>> &map_ptr){};
+  void setInputSource(const boost::shared_ptr<pcl::PointCloud<PointSource>> &scan_ptr){};
+  Pose getFinalPose(){};
 };
 
 #else

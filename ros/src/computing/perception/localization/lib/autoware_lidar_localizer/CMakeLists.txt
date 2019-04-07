@@ -12,7 +12,7 @@ execute_process(
 find_package(PCL REQUIRED)
 
 IF(NOT (PCL_VERSION VERSION_LESS "1.7.2"))
-SET(PCL_LIBRARY_PACKAGES pcl_omp_registration ndt_cpu ndt_gpu)
+SET(PCL_LIBRARY_PACKAGES pcl_omp_registration ndt_cpu)
 ENDIF(NOT (PCL_VERSION VERSION_LESS "1.7.2"))
 
 find_package( OpenMP )
@@ -24,6 +24,7 @@ endif()
 
 find_package(CUDA)
 if(CUDA_FOUND)
+   SET(PCL_LIBRARY_PACKAGES ${PCL_LIBRARY_PACKAGES} ndt_gpu)
    add_definitions(-DCUDA_FOUND)
 endif()
 

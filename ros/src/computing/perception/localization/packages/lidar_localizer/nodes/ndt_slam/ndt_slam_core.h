@@ -75,6 +75,9 @@ private:
                           &pose_conv_msg_ptr);
   void
   staticPoseCallback(const geometry_msgs::PoseStamped::ConstPtr &pose_msg_ptr);
+
+  void odomCallback(const nav_msgs::Odometry::ConstPtr &odom_msg_ptr);
+
   void mappingAndLocalizingPointsCallback(
       const sensor_msgs::PointCloud2::ConstPtr &mapping_points_msg_ptr,
       const sensor_msgs::PointCloud2::ConstPtr &localizing_points_msg_ptr);
@@ -99,6 +102,7 @@ private:
   ros::Subscriber points_map_sub_;
   ros::Subscriber initial_pose_sub_;
   ros::Subscriber static_pose_sub_;
+  ros::Subscriber odom_sub_;
 
   std::unique_ptr<message_filters::Subscriber<sensor_msgs::PointCloud2>>
       mapping_points_sub_;
@@ -126,6 +130,7 @@ private:
   double min_scan_range_;
   double max_scan_range_;
   double min_add_scan_shift_;
+  double use_odom_;
 
   PoseStamped init_pose_stamped_;
 };

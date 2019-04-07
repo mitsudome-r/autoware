@@ -32,7 +32,7 @@ NdtSlam::NdtSlam(ros::NodeHandle nh, ros::NodeHandle private_nh)
       with_mapping_(false), separate_mapping_(false),
       use_nn_point_z_when_initial_pose_(false), sensor_frame_("/velodyne"),
       base_link_frame_("/base_link"), map_frame_("/map"), min_scan_range_(5.0),
-      max_scan_range_(200.0), min_add_scan_shift_(1.0)
+      max_scan_range_(200.0), min_add_scan_shift_(1.0), use_odom_(false)
 
 {
   int method_type_tmp = 0;
@@ -113,6 +113,9 @@ NdtSlam::NdtSlam(ros::NodeHandle nh, ros::NodeHandle private_nh)
   ROS_INFO("use_nn_point_z_when_initial_pose: %d",
            use_nn_point_z_when_initial_pose_);
 
+  private_nh_.getParam("use_odom", use_odom_);
+  pose_interpolator_.setUseOdom(use_odom_);
+
   const std::time_t now = std::time(NULL);
   const std::tm *pnow = std::localtime(&now);
   char buffer[80];
@@ -164,6 +167,8 @@ NdtSlam::NdtSlam(ros::NodeHandle nh, ros::NodeHandle private_nh)
       nh_.subscribe("/points_map", 1, &NdtSlam::pointsMapUpdatedCallback, this);
   initial_pose_sub_ = nh_.subscribe("/initialpose", points_queue_size * 100,
                                     &NdtSlam::initialPoseCallback, this);
+  odom_sub_ = nh_.subscribe("/vehicle/odom", 1,
+                                    &NdtSlam::odomCallback, this);
 
   mapping_points_sub_.reset(
       new message_filters::Subscriber<sensor_msgs::PointCloud2>(
@@ -200,6 +205,7 @@ void NdtSlam::configCallback(
                config_msg_ptr->init_z, config_msg_ptr->init_roll,
                config_msg_ptr->init_pitch, config_msg_ptr->init_yaw);
     pose_interpolator_.clearPoseStamped();
+    pose_interpolator_.clearOdom();
   }
 
   localizer_ptr_->setStepSize(config_msg_ptr->step_size);
@@ -224,6 +230,9 @@ void NdtSlam::configCallback(
     }
   }
   with_mapping_ = config_msg_ptr->with_mapping;
+
+  use_odom_ = config_msg_ptr->use_odom;
+  pose_interpolator_.setUseOdom(use_odom_);
 }
 
 void NdtSlam::pointsMapUpdatedCallback(
@@ -231,6 +240,10 @@ void NdtSlam::pointsMapUpdatedCallback(
   pcl::PointCloud<PointTarget> pointcloud;
   pcl::fromROSMsg(*pointcloud2_msg_ptr, pointcloud);
   map_manager_.setMap(pointcloud.makeShared());
+}
+
+void NdtSlam::odomCallback( const nav_msgs::Odometry::ConstPtr &odom_msg_ptr){
+  pose_interpolator_.setOdom(*odom_msg_ptr);
 }
 
 void NdtSlam::initialPoseCallback(
@@ -276,6 +289,7 @@ void NdtSlam::initialPoseCallback(
 
   init_pose_stamped_ = PoseStamped(base_link_pose, current_time_sec);
   pose_interpolator_.clearPoseStamped();
+  pose_interpolator_.clearOdom();
 }
 
 void NdtSlam::staticPoseCallback(

@@ -18,25 +18,33 @@
 #define POSE_LINEAR_INTERPOLATOR_H
 
 #include "lidar_localizer/util/data_structs.h"
-
+#include <nav_msgs/Odometry.h>
 PoseStamped interpolatePose(const PoseStamped &pose_a,
                             const PoseStamped &pose_b, const double time_stamp);
+PoseStamped interpolatePose(const PoseStamped &pose,
+                            const nav_msgs::Odometry &odom,
+                            const double time_stamp);
 
 class PoseLinearInterpolator {
 public:
   PoseLinearInterpolator();
   ~PoseLinearInterpolator() = default;
   void clearPoseStamped();
+  void clearOdom();
   bool isNotSetPoseStamped() const;
   void pushbackPoseStamped(const PoseStamped &pose);
   PoseStamped getInterpolatePoseStamped(const double time_stamp) const;
   PoseStamped getCurrentPoseStamped() const;
   PoseStamped getPrevPoseStamped() const;
   Velocity getVelocity() const;
+  void setOdom(const nav_msgs::Odometry odom);
+  void setUseOdom(const bool use_odom);
 
 private:
   PoseStamped current_pose_;
   PoseStamped prev_pose_;
+  bool use_odom_;
+  nav_msgs::Odometry odom_;
 };
 
 #endif

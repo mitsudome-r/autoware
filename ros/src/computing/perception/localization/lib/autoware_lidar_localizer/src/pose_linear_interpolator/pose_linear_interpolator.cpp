@@ -24,6 +24,7 @@ PoseStamped interpolatePose(const PoseStamped &pose_a,
   }
 
   Velocity v(pose_a, pose_b);
+
   const double dt = time_stamp - pose_b.stamp;
 
   PoseStamped p;
@@ -37,7 +38,44 @@ PoseStamped interpolatePose(const PoseStamped &pose_a,
   return p;
 }
 
+PoseStamped interpolatePose(const PoseStamped &pose,
+                            const nav_msgs::Odometry &odom,
+                            const double time_stamp) {
+  if (pose.stamp == 0 || time_stamp == 0) {
+    return PoseStamped();
+  }
+
+  Velocity v;
+  v.linear.x = odom.twist.twist.linear.x;
+  v.linear.y = odom.twist.twist.linear.y;
+  v.linear.z = odom.twist.twist.linear.z;
+  v.angular.x = odom.twist.twist.angular.x;
+  v.angular.y = odom.twist.twist.angular.y;
+  v.angular.z = odom.twist.twist.angular.z;
+
+  const double dt = time_stamp - pose.stamp;
+
+  PoseStamped p;
+  p.pose.x = pose.pose.x + v.linear.x * dt;
+  p.pose.y = pose.pose.y + v.linear.y * dt;
+  p.pose.z = pose.pose.z + v.linear.z * dt;
+  p.pose.roll = pose.pose.roll;
+  p.pose.pitch = pose.pose.pitch;
+  p.pose.yaw = pose.pose.yaw + v.angular.z * dt;
+  p.stamp = time_stamp;
+  return p;
+}
+
 PoseLinearInterpolator::PoseLinearInterpolator() {}
+
+void PoseLinearInterpolator::clearOdom() {
+  odom_.twist.twist.linear.x = 0;
+  odom_.twist.twist.linear.y = 0;
+  odom_.twist.twist.linear.z = 0;
+  odom_.twist.twist.angular.x = 0;
+  odom_.twist.twist.angular.y = 0;
+  odom_.twist.twist.angular.z = 0;
+}
 
 void PoseLinearInterpolator::clearPoseStamped() {
   current_pose_.clear();
@@ -54,7 +92,11 @@ void PoseLinearInterpolator::pushbackPoseStamped(const PoseStamped &pose) {
 
 PoseStamped PoseLinearInterpolator::getInterpolatePoseStamped(
     const double time_stamp) const {
-  return interpolatePose(prev_pose_, current_pose_, time_stamp);
+  if (use_odom_){
+    return interpolatePose(current_pose_, odom_, time_stamp);
+  }else{
+    return interpolatePose(prev_pose_, current_pose_, time_stamp);
+  }
 }
 
 PoseStamped PoseLinearInterpolator::getCurrentPoseStamped() const {
@@ -67,4 +109,12 @@ PoseStamped PoseLinearInterpolator::getPrevPoseStamped() const {
 
 Velocity PoseLinearInterpolator::getVelocity() const {
   return Velocity(prev_pose_, current_pose_);
+}
+
+void PoseLinearInterpolator::setOdom(const nav_msgs::Odometry odom){
+  odom_ = odom;
+}
+
+void PoseLinearInterpolator::setUseOdom(const bool use_odom){
+  use_odom_ = use_odom;
 }

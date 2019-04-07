@@ -1757,6 +1757,14 @@ params :
       cmd_param :
         dash      : ''
         delim     : ':='
+    - name : use_odom
+      desc  : use_odom for pose interpolation
+      label : use_odom
+      kind  : checkbox
+      v     : False
+      cmd_param :
+        dash      : ''
+        delim     : ':='
 
   - name  : vel_pose_connect
     vars  :

@@ -21,7 +21,8 @@
 #include <nav_msgs/Odometry.h>
 PoseStamped interpolatePose(const PoseStamped &pose_a,
                             const PoseStamped &pose_b, const double time_stamp);
-PoseStamped interpolatePose(const PoseStamped &pose,
+PoseStamped interpolatePose(const PoseStamped &pose_a,
+                            const PoseStamped &pose_b,
                             const nav_msgs::Odometry &odom,
                             const double time_stamp);
 

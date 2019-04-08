@@ -38,30 +38,28 @@ PoseStamped interpolatePose(const PoseStamped &pose_a,
   return p;
 }
 
-PoseStamped interpolatePose(const PoseStamped &pose,
+PoseStamped interpolatePose(const PoseStamped &pose_a,
+                            const PoseStamped &pose_b,
                             const nav_msgs::Odometry &odom,
                             const double time_stamp) {
-  if (pose.stamp == 0 || time_stamp == 0) {
+  if (pose_a.stamp == 0 || pose_b.stamp == 0 || time_stamp == 0) {
     return PoseStamped();
   }
 
-  Velocity v;
-  v.linear.x = odom.twist.twist.linear.x;
-  v.linear.y = odom.twist.twist.linear.y;
-  v.linear.z = odom.twist.twist.linear.z;
+  Velocity v(pose_a, pose_b);
   v.angular.x = odom.twist.twist.angular.x;
   v.angular.y = odom.twist.twist.angular.y;
   v.angular.z = odom.twist.twist.angular.z;
 
-  const double dt = time_stamp - pose.stamp;
+  const double dt = time_stamp - pose_b.stamp;
 
   PoseStamped p;
-  p.pose.x = pose.pose.x + v.linear.x * dt;
-  p.pose.y = pose.pose.y + v.linear.y * dt;
-  p.pose.z = pose.pose.z + v.linear.z * dt;
-  p.pose.roll = pose.pose.roll;
-  p.pose.pitch = pose.pose.pitch;
-  p.pose.yaw = pose.pose.yaw + v.angular.z * dt;
+  p.pose.x = pose_b.pose.x + v.linear.x * dt;
+  p.pose.y = pose_b.pose.y + v.linear.y * dt;
+  p.pose.z = pose_b.pose.z + v.linear.z * dt;
+  p.pose.roll = pose_b.pose.roll;
+  p.pose.pitch = pose_b.pose.pitch;
+  p.pose.yaw = pose_b.pose.yaw + v.angular.z * dt;
   p.stamp = time_stamp;
   return p;
 }
@@ -93,8 +91,12 @@ void PoseLinearInterpolator::pushbackPoseStamped(const PoseStamped &pose) {
 PoseStamped PoseLinearInterpolator::getInterpolatePoseStamped(
     const double time_stamp) const {
   if (use_odom_){
-    return interpolatePose(current_pose_, odom_, time_stamp);
+    Velocity v(prev_pose_, current_pose_);
+    std::cerr << v << std::endl;
+    return interpolatePose(prev_pose_, current_pose_, odom_, time_stamp);
   }else{
+    Velocity v(prev_pose_, current_pose_);
+    std::cerr << v << std::endl;
     return interpolatePose(prev_pose_, current_pose_, time_stamp);
   }
 }

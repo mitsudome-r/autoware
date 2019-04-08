@@ -14,7 +14,7 @@ if (OPENMP_FOUND)
     add_definitions(-DOPENMP_FOUND)
 endif ()
 
-find_package(CUDA)
+find_package(CUDA) 
 
 if (CUDA_FOUND)
     add_definitions(-DCUDA_FOUND)

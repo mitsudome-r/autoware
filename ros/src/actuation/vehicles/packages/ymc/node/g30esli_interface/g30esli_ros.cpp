@@ -152,7 +152,7 @@ void G30esliROS::receiveStatus(const double& steering_offset_deg)
 
   // update twist
   double lv = status_.status.speed.actual / 3.6;                                    // [km/h] -> [m/s]
-  double th = (-status_.status.steer.actual + steering_offset_deg) * M_PI / 180.0;  // [deg] -> [rad]
+  double th = -(status_.status.steer.actual + steering_offset_deg) * M_PI / 180.0;  // [deg] -> [rad]
   double az = std::tan(th) * lv / G30ESLI_WHEEL_BASE;                               // [rad] -> [rad/s]
   current_twist_.header.frame_id = "base_link";
   current_twist_.header.stamp = now;

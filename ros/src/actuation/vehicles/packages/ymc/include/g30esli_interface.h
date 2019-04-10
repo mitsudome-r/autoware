@@ -47,7 +47,6 @@ private:
   bool use_ds4_;
   double steering_offset_deg_;
   double command_timeout_;
-  double brake_threshold_;
 
   // variables
   bool engage_;

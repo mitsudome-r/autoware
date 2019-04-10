@@ -62,8 +62,6 @@ private:
   unsigned char alive_;
   geometry_msgs::TwistStamped current_twist_;
   autoware_msgs::VehicleStatus vehicle_status_;
-  bool stop_state_;
-  const double stop_duration_secs_;
 
 public:
   G30esliROS();
@@ -73,12 +71,9 @@ public:
   void receiveStatus(const double& steering_offset_deg);
   void sendCommand(const MODE& mode);
 
-  void updateAutoCommand(const autoware_msgs::VehicleCmd& msg, const bool& engage, const double& steering_offset_deg,
-                         const double& brake_threshold);
-  void updateJoystickCommand(const ds4_msgs::DS4& msg, const bool& engage, const double& steering_offset_deg);
+  void updateCommand(const autoware_msgs::VehicleCmd& msg, const bool& engage, const double& steering_offset_deg);
+  void updateCommand(const ds4_msgs::DS4& msg, const bool& engage, const double& steering_offset_deg);
   void updateAliveCounter();
-
-  void updateState();
 
   bool checkOverride();
   bool checkTimeout(const MODE& mode, const double& timeout);

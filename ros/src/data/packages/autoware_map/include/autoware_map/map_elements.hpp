@@ -88,6 +88,22 @@ using WaypointMsg = autoware_map_msgs::Waypoint;
 using WaypointLaneRelationMsg = autoware_map_msgs::WaypointLaneRelation;
 using WaypointRelationMsg = autoware_map_msgs::WaypointRelation;
 using WaypointSignalRelationMsg = autoware_map_msgs::WaypointSignalRelation;
+using AreaArrayMsg = autoware_map_msgs::AreaArray;
+using LaneArrayMsg = autoware_map_msgs::LaneArray;
+using LaneAttributeRelationArrayMsg = autoware_map_msgs::LaneAttributeRelationArray;
+using LaneChangeRelationArrayMsg = autoware_map_msgs::LaneChangeRelationArray;
+using LaneRelationArrayMsg = autoware_map_msgs::LaneRelationArray;
+using LaneSignalLightRelationArrayMsg = autoware_map_msgs::LaneSignalLightRelationArray;
+using OppositeLaneRelationArrayMsg = autoware_map_msgs::OppositeLaneRelationArray;
+using PointArrayMsg = autoware_map_msgs::PointArray;
+using SignalLightArrayMsg = autoware_map_msgs::SignalLightArray;
+using SignalArrayMsg = autoware_map_msgs::SignalArray;
+using WayareaArrayMsg = autoware_map_msgs::WayareaArray;
+using WaypointArrayMsg = autoware_map_msgs::WaypointArray;
+using WaypointLaneRelationArrayMsg = autoware_map_msgs::WaypointLaneRelationArray;
+using WaypointRelationArrayMsg = autoware_map_msgs::WaypointRelationArray;
+using WaypointSignalRelationArrayMsg = autoware_map_msgs::WaypointSignalRelationArray;
+
 
 class Area;
 class Lane;

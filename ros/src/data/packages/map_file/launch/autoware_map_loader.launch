@@ -1,0 +1,5 @@
+<launch>
+	<arg name="map_dir" default="" />
+    <node pkg="map_file" type="autoware_map_loader" name="autoware_map_loader" args="$(arg map_dir)" output="screen" respawn="true"/>
+    <node pkg="autoware_map" type="autoware2vectormap_converter" name="amap2vmap_converter" output="screen" respawn="true"/>
+</launch>

@@ -68,13 +68,33 @@ class AutowareMapHandler {
   shared_vector<WaypointRelation> waypoint_relations_;
   shared_vector<WaypointSignalRelation> waypoint_signal_relations_;
 
+  std::map<category_t, ros::Subscriber>  subs_;
+
+  void updateLane(const LaneArrayMsg::ConstPtr &msg);
+  void updateLaneAttributeRelation(const LaneAttributeRelationArrayMsg::ConstPtr &msg);
+  void updateLaneRelation(const LaneRelationArrayMsg::ConstPtr &msg);
+  void updateLaneSignalLightRelation(const LaneSignalLightRelationArrayMsg::ConstPtr &msg);
+  void updateLaneChangeRelation(const LaneChangeRelationArrayMsg::ConstPtr &msg);
+  void updateOppositeLaneRelation(const OppositeLaneRelationArrayMsg::ConstPtr &msg);
+  void updatePoint(const PointArrayMsg::ConstPtr &msg);
+  void updateArea(const AreaArrayMsg::ConstPtr &msg);
+  void updateSignal(const SignalArrayMsg::ConstPtr &msg);
+  void updateSignalLight(const SignalLightArrayMsg::ConstPtr &msg);
+  void updateWayarea(const WayareaArrayMsg::ConstPtr &msg);
+  void updateWaypoint(const WaypointArrayMsg::ConstPtr &msg);
+  void updateWaypointRelation(const WaypointRelationArrayMsg::ConstPtr &msg);
+  void updateWaypointLaneRelation(const WaypointLaneRelationArrayMsg::ConstPtr &msg);
+  void updateWaypointSignalRelation(const WaypointSignalRelationArrayMsg::ConstPtr &msg);
+
+
 public:
   AutowareMapHandler(){};
   void registerSubscriber(ros::NodeHandle& nh, category_t category);
   void subscribe(ros::NodeHandle& nh, category_t category);
   void subscribe(ros::NodeHandle& nh, category_t category, const ros::Duration& timeout);
   void subscribe(ros::NodeHandle& nh, category_t category, const size_t max_retries);
-
+  bool hasSubscribed(category_t category) const;
+  category_t hasSubscribed() const;
 
   void setFromAutowareMapMsgs(const std::vector<autoware_map_msgs::Area> areas,
                               const std::vector<autoware_map_msgs::Lane> lanes,

@@ -441,4 +441,358 @@ void AutowareMapHandler::setFromAutowareMapMsgs(const std::vector<autoware_map_m
     }
     // resolveRelations();
 }
+
+void AutowareMapHandler::subscribe(ros::NodeHandle& nh, category_t category)
+{
+    registerSubscriber(nh, category);
+    ros::Rate rate(10);
+    while (ros::ok() && !hasSubscribed(category))
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
+    resolveRelations();
+}
+
+void AutowareMapHandler::subscribe(ros::NodeHandle& nh, category_t category, const ros::Duration& timeout)
+{
+    registerSubscriber(nh, category);
+    ros::Rate rate(10);
+    ros::Time end = ros::Time::now() + timeout;
+    while (ros::ok() && !hasSubscribed(category) && ros::Time::now() < end)
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
+    resolveRelations();
+}
+
+void AutowareMapHandler::subscribe(ros::NodeHandle& nh, category_t category, const size_t max_retries)
+{
+    size_t tries = 0;
+    registerSubscriber(nh, category);
+    ros::Rate rate(10);
+    while (ros::ok() && !hasSubscribed(category) && tries++ < max_retries)
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
+    resolveRelations();
+}
+
+
+void AutowareMapHandler::registerSubscriber(ros::NodeHandle& nh, category_t category)
+{
+  if (category & LANE)
+  {
+    subs_[LANE] = nh.subscribe( "/autoware_map_info/lane", 1, &AutowareMapHandler::updateLane, this);
+  }
+  if (category & LANE_ATTRIBUTE_RELATION)
+  {
+    subs_[LANE_ATTRIBUTE_RELATION] = nh.subscribe( "/autoware_map_info/lane_attribute_relation", 1, &AutowareMapHandler::updateLaneAttributeRelation,this );
+  }
+  if (category & LANE_RELATION)
+  {
+    subs_[LANE_RELATION] = nh.subscribe( "/autoware_map_info/lane_relation", 1, &AutowareMapHandler::updateLaneRelation,this );
+  }
+  if (category & LANE_SIGNAL_LIGHT_RELATION)
+  {
+    subs_[LANE_SIGNAL_LIGHT_RELATION] = nh.subscribe( "/autoware_map_info/lane_signal_light_relation", 1, &AutowareMapHandler::updateLaneSignalLightRelation,this );
+  }
+  if (category & LANE_CHANGE_RELATION)
+  {
+    subs_[LANE_CHANGE_RELATION] = nh.subscribe( "/autoware_map_info/lane_change_relation", 1, &AutowareMapHandler::updateLaneChangeRelation,this );
+  }
+  if (category & OPPOSITE_LANE_RELATION)
+  {
+    subs_[OPPOSITE_LANE_RELATION] = nh.subscribe( "/autoware_map_info/opposite_lane_relation", 1, &AutowareMapHandler::updateOppositeLaneRelation,this );
+  }
+  if (category & POINT)
+  {
+    subs_[POINT] = nh.subscribe( "/autoware_map_info/point", 1, &AutowareMapHandler::updatePoint,this );
+  }
+  if (category & AREA)
+  {
+    subs_[AREA] = nh.subscribe( "/autoware_map_info/area", 1, &AutowareMapHandler::updateArea,this );
+  }
+  if (category & SIGNAL)
+  {
+    subs_[SIGNAL] = nh.subscribe( "/autoware_map_info/signal", 1, &AutowareMapHandler::updateSignal,this );
+  }
+  if (category & SIGNAL_LIGHT)
+  {
+    subs_[SIGNAL_LIGHT] = nh.subscribe( "/autoware_map_info/signal_light", 1, &AutowareMapHandler::updateSignalLight,this );
+  }
+  if (category & WAYAREA)
+  {
+    subs_[WAYAREA] = nh.subscribe( "/autoware_map_info/wayarea", 1, &AutowareMapHandler::updateWayarea,this );
+  }
+  if (category & WAYPOINT)
+  {
+    subs_[WAYPOINT] = nh.subscribe( "/autoware_map_info/waypoint", 1, &AutowareMapHandler::updateWaypoint,this );
+  }
+  if (category & WAYPOINT_LANE_RELATION)
+  {
+    subs_[WAYPOINT_LANE_RELATION] = nh.subscribe( "/autoware_map_info/waypoint_lane_relation", 1, &AutowareMapHandler::updateWaypointLaneRelation,this );
+  }
+  if (category & WAYPOINT_RELATION)
+  {
+    subs_[WAYPOINT_RELATION] = nh.subscribe( "/autoware_map_info/waypoint_relation", 1, &AutowareMapHandler::updateWaypointRelation,this );
+  }
+  if (category & WAYPOINT_SIGNAL_RELATION)
+  {
+    subs_[WAYPOINT_SIGNAL_RELATION] = nh.subscribe( "/autoware_map_info/waypoint_signal_relation", 1, &AutowareMapHandler::updateWaypointSignalRelation,this );
+  }
+}
+
+bool AutowareMapHandler::hasSubscribed(category_t category) const
+{
+    if (category & LANE)
+    {
+        if (lanes_.empty())
+            return false;
+    }
+    if (category & LANE_ATTRIBUTE_RELATION)
+    {
+        if (lane_attribute_relations_.empty())
+            return false;
+    }
+    if (category & LANE_RELATION)
+    {
+        if (lane_relations_.empty())
+            return false;
+    }
+    if (category & LANE_SIGNAL_LIGHT_RELATION)
+    {
+        if (lane_signal_light_relations_.empty())
+            return false;
+    }
+    if (category & LANE_CHANGE_RELATION)
+    {
+        if (lane_change_relations_.empty())
+            return false;
+    }
+    if (category & OPPOSITE_LANE_RELATION)
+    {
+        if (opposite_lane_relations_.empty())
+            return false;
+    }
+    if (category & POINT)
+    {
+        if (points_.empty())
+            return false;
+    }
+    if (category & AREA)
+    {
+        if (areas_.empty())
+            return false;
+    }
+    if (category & SIGNAL)
+    {
+        if (signals_.empty())
+            return false;
+    }
+    if (category & SIGNAL_LIGHT)
+    {
+        if (signal_lights_.empty())
+            return false;
+    }
+    if (category & WAYAREA)
+    {
+        if (wayareas_.empty())
+            return false;
+    }
+    if (category & WAYPOINT)
+    {
+        if (waypoints_.empty())
+            return false;
+    }
+    if (category & WAYPOINT_LANE_RELATION)
+    {
+        if (waypoint_lane_relations_.empty())
+            return false;
+    }
+    if (category & WAYPOINT_RELATION)
+    {
+        if (waypoint_relations_.empty())
+            return false;
+    }
+    if (category & WAYPOINT_SIGNAL_RELATION)
+    {
+        if (waypoint_signal_relations_.empty())
+            return false;
+    }
+    return true;
+}
+category_t AutowareMapHandler::hasSubscribed() const
+{
+    category_t category=NONE;
+    if (!lanes_.empty())
+        category |= LANE;
+    if (!lane_attribute_relations_.empty())
+        category |= LANE_ATTRIBUTE_RELATION;
+    if (!lane_relations_.empty())
+        category |= LANE_RELATION;
+    if (!lane_signal_light_relations_.empty())
+        category |= LANE_SIGNAL_LIGHT_RELATION;
+    if (!lane_change_relations_.empty())
+        category |= LANE_CHANGE_RELATION;
+    if (!opposite_lane_relations_.empty())
+        category |= OPPOSITE_LANE_RELATION;
+    if (!points_.empty())
+        category |= POINT;
+    if (!areas_.empty())
+        category |= AREA;
+    if (!signals_.empty())
+        category |= SIGNAL;
+    if (!signal_lights_.empty())
+        category |= SIGNAL_LIGHT;
+    if (!wayareas_.empty())
+        category |= WAYAREA;
+    if (!waypoints_.empty())
+        category |= WAYPOINT;
+    if (!waypoint_lane_relations_.empty())
+        category |= WAYPOINT_LANE_RELATION;
+    if (!waypoint_relations_.empty())
+        category |= WAYPOINT_RELATION;
+    if (!waypoint_signal_relations_.empty())
+        category |= WAYPOINT_SIGNAL_RELATION;
+
+    return category;
+}
+
+
+void AutowareMapHandler::updateLane(const LaneArrayMsg::ConstPtr &msg)
+{
+  lanes_.clear();
+  for (const auto& data : msg->data)
+  {
+    lanes_[data.lane_id] = std::make_shared<Lane>(data);
+  }
+}
+
+void AutowareMapHandler::updateLaneAttributeRelation(const LaneAttributeRelationArrayMsg::ConstPtr &msg)
+{
+  lane_attribute_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<LaneAttributeRelation> item = std::make_shared<LaneAttributeRelation>(data);
+    lane_attribute_relations_.push_back(item);
+  }
+}
+
+void AutowareMapHandler::updateLaneRelation(const LaneRelationArrayMsg::ConstPtr &msg)
+{
+  lane_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<LaneRelation> item = std::make_shared<LaneRelation>(data);
+    lane_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updateLaneSignalLightRelation(const LaneSignalLightRelationArrayMsg::ConstPtr &msg)
+{
+  lane_signal_light_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<LaneSignalLightRelation> item = std::make_shared<LaneSignalLightRelation>(data);
+    lane_signal_light_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updateLaneChangeRelation(const LaneChangeRelationArrayMsg::ConstPtr &msg)
+{
+  lane_change_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<LaneChangeRelation> item = std::make_shared<LaneChangeRelation>(data);
+    lane_change_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updateOppositeLaneRelation(const OppositeLaneRelationArrayMsg::ConstPtr &msg)
+{
+  opposite_lane_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<OppositeLaneRelation> item = std::make_shared<OppositeLaneRelation>(data);
+    opposite_lane_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updatePoint(const PointArrayMsg::ConstPtr &msg)
+{
+  points_.clear();
+  for (const auto& data : msg->data)
+  {
+    points_[data.point_id] = std::make_shared<Point>(data);
+  }
+}
+void AutowareMapHandler::updateArea(const AreaArrayMsg::ConstPtr &msg)
+{
+  areas_.clear();
+  for (const auto& data : msg->data)
+  {
+    areas_[data.area_id] = std::make_shared<Area>(data);
+  }
+}
+
+void AutowareMapHandler::updateSignal(const SignalArrayMsg::ConstPtr &msg)
+{
+  signals_.clear();
+  for (const auto& data : msg->data)
+  {
+    signals_[data.signal_id] = std::make_shared<Signal>(data);
+  }
+}
+void AutowareMapHandler::updateSignalLight(const SignalLightArrayMsg::ConstPtr &msg)
+{
+  signal_lights_.clear();
+  for (const auto& data : msg->data)
+  {
+    signal_lights_[data.signal_light_id] = std::make_shared<SignalLight>(data);
+  }
+}
+void AutowareMapHandler::updateWayarea(const WayareaArrayMsg::ConstPtr &msg)
+{
+  wayareas_.clear();
+  for (const auto& data : msg->data)
+  {
+    wayareas_[data.wayarea_id] = std::make_shared<Wayarea>(data);
+  }
+}
+void AutowareMapHandler::updateWaypoint(const WaypointArrayMsg::ConstPtr &msg)
+{
+  waypoints_.clear();
+  for (const auto& data : msg->data)
+  {
+    waypoints_[data.waypoint_id] = std::make_shared<Waypoint>(data);
+  }
+}
+void AutowareMapHandler::updateWaypointRelation(const WaypointRelationArrayMsg::ConstPtr &msg)
+{
+  waypoint_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<WaypointRelation> item = std::make_shared<WaypointRelation>(data);
+    waypoint_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updateWaypointLaneRelation(const WaypointLaneRelationArrayMsg::ConstPtr &msg)
+{
+  waypoint_lane_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<WaypointLaneRelation> item = std::make_shared<WaypointLaneRelation>(data);
+    waypoint_lane_relations_.push_back(item);
+  }
+}
+void AutowareMapHandler::updateWaypointSignalRelation(const WaypointSignalRelationArrayMsg::ConstPtr &msg)
+{
+  waypoint_signal_relations_.clear();
+  for (const auto& data : msg->data)
+  {
+    std::shared_ptr<WaypointSignalRelation> item = std::make_shared<WaypointSignalRelation>(data);
+    waypoint_signal_relations_.push_back(item);
+  }
+}
+
+
 }

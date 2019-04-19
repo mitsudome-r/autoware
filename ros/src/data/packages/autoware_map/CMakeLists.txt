@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 2.8.3)
 project(autoware_map)
 
 find_package(autoware_build_flags REQUIRED)
-find_package(autoware_map_msgs REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   tf
   geometry_msgs
   visualization_msgs
+  autoware_map_msgs
 )
 
 set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")
@@ -16,13 +16,13 @@ set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES autoware_map
- CATKIN_DEPENDS roscpp tf visualization_msgs geometry_msgs
+ CATKIN_DEPENDS roscpp tf visualization_msgs geometry_msgs autoware_map_msgs
 )
 
 include_directories(
 	include
-  ${catkin_INCLUDE_DIRS}
-  ${autoware_map_msgs_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+    ${autoware_map_msgs_INCLUDE_DIRS}
 )
 
 add_library( autoware_map lib/autoware_map/map_handler.cpp lib/autoware_map/util.cpp lib/autoware_map/visualization.cpp )

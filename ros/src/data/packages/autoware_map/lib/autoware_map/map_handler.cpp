@@ -343,6 +343,7 @@ void AutowareMapHandler::resolveRelations()
         std::shared_ptr<SignalLight> signal_light = item.second;
         std::shared_ptr<Signal> signal= signals_.at(signal_light->signal_id);
         signal->signal_lights.push_back(signal_light);
+        signal_light->point = points_.at(signal_light->point_id); 
         signal_light->signal = signal;
     }
 

@@ -402,6 +402,7 @@ class SignalLight : public SignalLightMsg {
 public:
   int id;
   std::weak_ptr<Signal> signal;
+  std::weak_ptr<Point> point;
   weak_vector<LaneSignalLightRelation> signal_light_relations;
 
   SignalLight(autoware_map_msgs::SignalLight light)
@@ -415,6 +416,11 @@ public:
     color_type = light.color_type;
     arrow_type = light.arrow_type;
   }
+  std::shared_ptr<Point> getPointPtr() const
+  {
+    return point.lock();
+  }
+
 };
 
 class Wayarea : public WayareaMsg {

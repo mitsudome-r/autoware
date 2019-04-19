@@ -239,6 +239,7 @@ std::vector<WaypointSignalRelation> AutowareMapHandler::findByFilter(const Filte
 
 void AutowareMapHandler::resolveRelations()
 {
+    std::cerr << __LINE__ << std::endl;
     for (auto relation : lane_attribute_relations_)
     {
         std::shared_ptr<Lane> lane = lanes_.at(relation->lane_id);
@@ -249,6 +250,7 @@ void AutowareMapHandler::resolveRelations()
         }
         relation->lane = lane;
     }
+    std::cerr << __LINE__ << std::endl;
 
     for (auto relation : lane_change_relations_)
     {
@@ -257,6 +259,7 @@ void AutowareMapHandler::resolveRelations()
         lane->lane_change_relations.push_back(relation);
     }
 
+    std::cerr << __LINE__ << std::endl;
     for (auto relation : lane_relations_)
     {
         std::shared_ptr<Lane> lane = lanes_.at(relation->lane_id);
@@ -266,6 +269,7 @@ void AutowareMapHandler::resolveRelations()
         lane->lane_relations.push_back(relation);
     }
 
+    std::cerr << __LINE__ << std::endl;
     for (auto relation : lane_signal_light_relations_)
     {
         std::shared_ptr<Lane> lane = lanes_.at(relation->lane_id);
@@ -276,6 +280,7 @@ void AutowareMapHandler::resolveRelations()
         signal_light->signal_light_relations.push_back(relation);
     }
 
+    std::cerr << __LINE__ << std::endl;
     for (auto relation : opposite_lane_relations_)
     {
         std::shared_ptr<Lane> lane = lanes_.at(relation->lane_id);
@@ -286,6 +291,7 @@ void AutowareMapHandler::resolveRelations()
         relation->opposite_lane = opposite_lane;
     }
 
+    std::cerr << __LINE__ << std::endl;
     for (auto relation : waypoint_lane_relations_)
     {
         std::shared_ptr<Lane> lane = lanes_.at(relation->lane_id);
@@ -296,6 +302,7 @@ void AutowareMapHandler::resolveRelations()
         relation->waypoint = waypoint;
     }
 
+    std::cerr << __LINE__ << std::endl;
     for( auto relation : waypoint_relations_)
     {
         std::shared_ptr<Waypoint> waypoint = waypoints_.at(relation->waypoint_id);
@@ -306,6 +313,7 @@ void AutowareMapHandler::resolveRelations()
         relation->next_waypoint = next_waypoint;
     }
 
+    std::cerr << __LINE__ << std::endl;
     for(auto relation : waypoint_signal_relations_)
     {
         std::shared_ptr<Waypoint> waypoint = waypoints_.at(relation->waypoint_id);
@@ -316,6 +324,7 @@ void AutowareMapHandler::resolveRelations()
         relation->signal = signal;
     }
 
+    std::cerr << __LINE__ << std::endl;
     for(auto item : areas_)
     {
         std::shared_ptr<Area> area = item.second;
@@ -325,6 +334,7 @@ void AutowareMapHandler::resolveRelations()
         }
     }
 
+    std::cerr << __LINE__ << std::endl;
     for (auto item : lanes_)
     {
         std::shared_ptr<Lane> lane = item.second;
@@ -338,21 +348,24 @@ void AutowareMapHandler::resolveRelations()
         lane->waypoints.push_back(waypoint);
     }
 
+    std::cerr << __LINE__ << std::endl;
     for ( auto item : signal_lights_)
     {
         std::shared_ptr<SignalLight> signal_light = item.second;
-        std::shared_ptr<Signal> signal= signals_.at(signal_light->signal_id);
-        signal->signal_lights.push_back(signal_light);
-        signal_light->point = points_.at(signal_light->point_id); 
-        signal_light->signal = signal;
+        // std::shared_ptr<Signal> signal= signals_.at(signal_light->signal_id);
+        // signal->signal_lights.push_back(signal_light);
+        signal_light->point = points_.at(signal_light->point_id);
+        // signal_light->signal = signal;
     }
 
+    std::cerr << __LINE__ << std::endl;
     for ( auto item : wayareas_)
     {
         std::shared_ptr<Wayarea> wayarea = item.second;
         wayarea->area = areas_.at(wayarea->area_id);
     }
 
+    std::cerr << __LINE__ << std::endl;
     for ( auto item : waypoints_)
     {
         std::shared_ptr<Waypoint> waypoint = item.second;

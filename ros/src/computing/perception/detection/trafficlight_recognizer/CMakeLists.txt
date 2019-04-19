@@ -27,6 +27,7 @@ find_package(catkin REQUIRED COMPONENTS
         visualization_msgs
         waypoint_follower
         autoware_msgs
+        autoware_map
         vector_map
         )
 

@@ -25,7 +25,6 @@
 #include <vector_map/vector_map.h>
 #include <vector_map_server/GetSignal.h>
 #include <autoware_msgs/Lane.h>
-#include <autoware_map/map_handler.hpp>
 
 static std::string camera_id_str;
 
@@ -40,8 +39,6 @@ typedef struct
 	double thiY;
 	double thiZ;
 } Angle;
-
-static autoware_map::AutowareMapHandler amap;
 
 static VectorMap vmap;
 //static Angle cameraOrientation; // camera orientation = car's orientation
@@ -311,12 +308,14 @@ void echoSignals2(ros::Publisher &pub, bool useOpenGLCoord = false)
 			ROS_INFO("[feat_proj] VectorMapServer available. Publishing only TrafficSignals on the current lane");
 		}
 	}
-	// std::cerr << __LINE__ << std::endl;
-	for (const auto& signal : amap.findByFilter([](autoware_map::SignalLight){return true; }))
+
+	for (const auto& signal_map : vmap.signals)
 	{
-		Point3 signalcenter(signal.getPointPtr()->x, signal.getPointPtr()->y, signal.getPointPtr()->z);// = vmap.getPoint(pid);
+		const Signal signal = signal_map.second;
+		int pid = vmap.vectors[signal.vid].pid;
+
+		Point3 signalcenter = vmap.getPoint(pid);
 		Point3 signalcenterx(signalcenter.x(), signalcenter.y(), signalcenter.z() + SignalLampRadius);
-		// ROS_ERROR_STREAM(signal.getPointPtr()->x << " " <<  signal.getPointPtr()->y << " " << signal.getPointPtr()->z);
 
 		int u, v;
 		if (project2(signalcenter, u, v, useOpenGLCoord) == true)
@@ -330,27 +329,25 @@ void echoSignals2(ros::Publisher &pub, bool useOpenGLCoord = false)
 			radius = (int) distance(ux, vx, u, v);
 
 			autoware_msgs::ExtractedPosition sign;
-			sign.signalId = signal.signal_light_id;
+			sign.signalId = signal.id;
 
 			sign.u = u + adjust_proj_x; // shift project position by configuration value from runtime manager
 			sign.v = v + adjust_proj_y; // shift project position by configuration value from runtime manager
 
 			sign.radius = radius;
 			sign.x = signalcenter.x(), sign.y = signalcenter.y(), sign.z = signalcenter.z();
-			sign.hang = signal.horizontal_angle;//vmap.vectors[signal.vid].hang; // hang is expressed in [0, 360] degree
-			sign.type = signal.color_type; //signal.type, sign.linkId = signal.linkid;
-			sign.linkId = signal.signal_id;
-			sign.plId = signal.signal_id;
+			sign.hang = vmap.vectors[signal.vid].hang; // hang is expressed in [0, 360] degree
+			sign.type = signal.type, sign.linkId = signal.linkid;
+			sign.plId = signal.plid;
 
 			// Get holizontal angle of signal in camera corrdinate system
-			double signal_angle = GetSignalAngleInCameraSystem(signal.horizontal_angle + 180.0f,
-			                                                   signal.vertical_angle + 180.0f);
+			double signal_angle = GetSignalAngleInCameraSystem(vmap.vectors[signal.vid].hang + 180.0f,
+			                                                   vmap.vectors[signal.vid].vang + 180.0f);
 
 			// signal_angle will be zero if signal faces to x-axis
 			// Target signal should be face to -50 <= z-axis (= 90 degree) <= +50
 			if (isRange(-50, 50, signal_angle - 90))
 			{
-				ROS_INFO_STREAM(sign.u << " " << sign.v);
 				signalsInFrame.Signals.push_back(sign);
 			}
 		}
@@ -422,11 +419,15 @@ int main(int argc, char *argv[])
 	/* wait until loading all vector map is completed */
 	ros::Rate wait_rate(100);
 	std::cout << "Loading Vector Map. Please wait";
+	while (vmap.points.empty() || vmap.lines.empty() || vmap.whitelines.empty() ||
+	       vmap.lanes.empty() || vmap.dtlanes.empty() || vmap.vectors.empty() || vmap.signals.empty())
+	{
+		ros::spinOnce();
+		std::cout << ".";
+		wait_rate.sleep();
+	}
 
-	autoware_map::category_t category = autoware_map::Category::SIGNAL_LIGHT | autoware_map::Category::POINT;
-
-	amap.subscribe(rosnode, category);
-
+	vmap.loaded = true;
 	std::cout << "Loaded." << std::endl;
 
 	ros::Subscriber cameraInfoSubscriber = rosnode.subscribe(cameraInfo_topic_name, 100, cameraInfoCallback);

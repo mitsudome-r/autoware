@@ -82,9 +82,10 @@ target_link_libraries(autoware_map_loader ${catkin_LIBRARIES} get_file ${CURL_LI
 ## Install executables and/or libraries
 install(TARGETS
         get_file
+        autoware_map_loader
         points_map_loader
         vector_map_loader
-    points_map_filter
+        points_map_filter
     ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
     RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -21,7 +21,7 @@ OpenDriveLoader::~OpenDriveLoader()
 {
 }
 
-void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map, const double& resolution)
+void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map, double resolution)
 {
 	std::ifstream f(xodr_file.c_str());
 	if(!f.good())
@@ -47,7 +47,7 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 
 	std::cout << " >> Reading Header Data from OpenDRIVE map file ... " << std::endl;
 	std::vector<TiXmlElement*> elements;
-	XmlHelpers::FindFirstElement("header", doc.FirstChildElement(), elements);
+	XmlHelpers::findFirstElement("header", doc.FirstChildElement(), elements);
 
 	std::cout << "Final Results, Num:" << elements.size() <<std::endl;
 
@@ -59,7 +59,7 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 
 	std::cout << " >> Reading Data from OpenDRIVE map file ... " << std::endl;
 	elements.clear();
-	XmlHelpers::FindElements("road", doc.FirstChildElement(), elements);
+	XmlHelpers::findElements("road", doc.FirstChildElement(), elements);
 	std::cout << "Final Results Roads, Num:" << elements.size() << std::endl;
 
 	roads_list_.clear();
@@ -70,7 +70,7 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 
 
 	elements.clear();
-	XmlHelpers::FindElements("junction", doc.FirstChildElement(), elements);
+	XmlHelpers::findElements("junction", doc.FirstChildElement(), elements);
 
 	std::cout << "Final Results Junctions, Num:" << elements.size() << std::endl;
 
@@ -81,18 +81,18 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 	}
 
 	//Connect Roads
-	ConnectRoads();
+	connectRoads();
 
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
 		std::cout << "Road ID: " << roads_list_.at(i).id_ << std::endl;
 		 std::cout << "From: ";
-		for(unsigned int j=0; j < roads_list_.at(i).from_roads.size(); j++)
+		for(unsigned int j=0; j < roads_list_.at(i).from_roads_.size(); j++)
 		{
-			std::cout << "("  << roads_list_.at(i).from_roads.at(j).incoming_road_ << "|";
-			for(unsigned int k=0; k < roads_list_.at(i).from_roads.at(j).lane_links.size(); k++)
+			std::cout << "("  << roads_list_.at(i).from_roads_.at(j).incoming_road_ << "|";
+			for(unsigned int k=0; k < roads_list_.at(i).from_roads_.at(j).lane_links.size(); k++)
 			{
-				std::cout << roads_list_.at(i).from_roads.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads.at(j).lane_links.at(k).second << " ; ";
+				std::cout << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).second << " ; ";
 			}
 			std::cout << ")";
 		}
@@ -100,12 +100,12 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 		std::cout << std::endl;
 		std::cout << "To : " ;
 
-		for(unsigned int j=0; j < roads_list_.at(i).to_roads.size(); j++)
+		for(unsigned int j=0; j < roads_list_.at(i).to_roads_.size(); j++)
 		{
-			std::cout << "("  << roads_list_.at(i).to_roads.at(j).outgoing_road_ <<"|";
-			for(unsigned int k=0; k < roads_list_.at(i).to_roads.at(j).lane_links.size(); k++)
+			std::cout << "("  << roads_list_.at(i).to_roads_.at(j).outgoing_road_ <<"|";
+			for(unsigned int k=0; k < roads_list_.at(i).to_roads_.at(j).lane_links.size(); k++)
 			{
-				std::cout << roads_list_.at(i).to_roads.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads.at(j).lane_links.at(k).second << " ; ";
+				std::cout << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).second << " ; ";
 			}
 			std::cout << ")";
 		}
@@ -118,29 +118,29 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 	PlannerHNS::RoadSegment segment;
 	segment.id = 1;
 	map.roadSegments.push_back(segment);
-	GetMapLanes(map.roadSegments.at(0).Lanes, resolution);
+	getMapLanes(map.roadSegments.at(0).Lanes, resolution);
 	std::cout << "Finish Extracting Lanes: " << map.roadSegments.at(0).Lanes.size() << std::endl;
 
-	GetTrafficLights(map.trafficLights);
-	GetTrafficSigns(map.signs);
-	GetStopLines(map.stopLines);
+	getTrafficLights(map.trafficLights);
+	getTrafficSigns(map.signs);
+	getStopLines(map.stopLines);
 
 	std::cout << "Finish Extracting Traffic Objects ... " << std::endl;
 
-	LinkWayPoints(map);
+	linkWayPoints(map);
 
 	std::cout << "Finish Linking Way Points ... " << std::endl;
 
 }
 
-std::vector<OpenDriveRoad*> OpenDriveLoader::GetRoadsBySuccId(const int& _id)
+std::vector<OpenDriveRoad*> OpenDriveLoader::getRoadsBySuccId(int _id)
 {
 	std::vector<OpenDriveRoad*> _ret_list;
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
 		for(unsigned int j=0; j < roads_list_.at(i).successor_road_.size(); j++)
 		{
-			if(roads_list_.at(i).successor_road_.at(j).to_road_id == _id)
+			if(roads_list_.at(i).successor_road_.at(j).to_road_id_ == _id)
 			{
 				_ret_list.push_back(&roads_list_.at(i));
 			}
@@ -150,14 +150,14 @@ std::vector<OpenDriveRoad*> OpenDriveLoader::GetRoadsBySuccId(const int& _id)
 	return _ret_list;
 }
 
-std::vector<OpenDriveRoad*> OpenDriveLoader::GetRoadsByPredId(const int& _id)
+std::vector<OpenDriveRoad*> OpenDriveLoader::getRoadsByPredId(int _id)
 {
 	std::vector<OpenDriveRoad*> _ret_list;
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
 		for(unsigned int j=0; j < roads_list_.at(i).predecessor_road_.size(); j++)
 		{
-			if(roads_list_.at(i).predecessor_road_.at(j).from_road_id == _id)
+			if(roads_list_.at(i).predecessor_road_.at(j).from_road_id_ == _id)
 			{
 				_ret_list.push_back(&roads_list_.at(i));
 			}
@@ -167,7 +167,7 @@ std::vector<OpenDriveRoad*> OpenDriveLoader::GetRoadsByPredId(const int& _id)
 	return _ret_list;
 }
 
-OpenDriveRoad* OpenDriveLoader::GetRoadById(const int& _id)
+OpenDriveRoad* OpenDriveLoader::getRoadById(int _id)
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
@@ -180,7 +180,7 @@ OpenDriveRoad* OpenDriveLoader::GetRoadById(const int& _id)
 	return nullptr;
 }
 
-Junction* OpenDriveLoader::GetJunctionById(const int& _id)
+Junction* OpenDriveLoader::getJunctionById(int _id)
 {
 	for(unsigned int i=0; i < junctions_list_.size(); i++)
 	{
@@ -193,30 +193,30 @@ Junction* OpenDriveLoader::GetJunctionById(const int& _id)
 	return nullptr;
 }
 
-void OpenDriveLoader::ConnectRoads()
+void OpenDriveLoader::connectRoads()
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
 		if(roads_list_.at(i).predecessor_road_.size() > 0)
 		{
 			//connect normal roads , junctions will be handeled alone
-			if(roads_list_.at(i).predecessor_road_.at(0).link_type == ROAD_LINK)
+			if(roads_list_.at(i).predecessor_road_.at(0).link_type_ == ROAD_LINK)
 			{
-				OpenDriveRoad* p_pre_road = GetRoadById(roads_list_.at(i).predecessor_road_.at(0).from_road_id);
+				OpenDriveRoad* p_pre_road = getRoadById(roads_list_.at(i).predecessor_road_.at(0).from_road_id_);
 				if(p_pre_road != nullptr)
 				{
-					std::vector<Connection> pre_conn_list = p_pre_road->GetLastSectionConnections();
+					std::vector<Connection> pre_conn_list = p_pre_road->getLastSectionConnections();
 					for(unsigned k=0; k < pre_conn_list.size(); k++)
 					{
 						pre_conn_list.at(k).outgoing_road_ = roads_list_.at(i).id_;
-						roads_list_.at(i).InsertUniqueFromConnection(pre_conn_list.at(k));
+						roads_list_.at(i).insertUniqueFromConnection(pre_conn_list.at(k));
 					}
 
-					std::vector<Connection> my_conn_list = roads_list_.at(i).GetFirstSectionConnections();
+					std::vector<Connection> my_conn_list = roads_list_.at(i).getFirstSectionConnections();
 					for(unsigned k=0; k < my_conn_list.size(); k++)
 					{
 						my_conn_list.at(k).incoming_road_ = p_pre_road->id_;
-						roads_list_.at(i).InsertUniqueFromConnection(my_conn_list.at(k));
+						roads_list_.at(i).insertUniqueFromConnection(my_conn_list.at(k));
 					}
 				}
 			}
@@ -225,23 +225,23 @@ void OpenDriveLoader::ConnectRoads()
 		if(roads_list_.at(i).successor_road_.size() > 0)
 		{
 			//connect normal roads , junctions will be handeled alone
-			if(roads_list_.at(i).successor_road_.at(0).link_type == ROAD_LINK)
+			if(roads_list_.at(i).successor_road_.at(0).link_type_ == ROAD_LINK)
 			{
-				OpenDriveRoad* p_suc_road = GetRoadById(roads_list_.at(i).successor_road_.at(0).to_road_id);
+				OpenDriveRoad* p_suc_road = getRoadById(roads_list_.at(i).successor_road_.at(0).to_road_id_);
 				if(p_suc_road != nullptr)
 				{
-					std::vector<Connection> suc_conn_list = p_suc_road->GetFirstSectionConnections();
+					std::vector<Connection> suc_conn_list = p_suc_road->getFirstSectionConnections();
 					for(unsigned k=0; k < suc_conn_list .size(); k++)
 					{
 						suc_conn_list.at(k).incoming_road_ = roads_list_.at(i).id_;
-						roads_list_.at(i).InsertUniqueToConnection(suc_conn_list .at(k));
+						roads_list_.at(i).insertUniqueToConnection(suc_conn_list .at(k));
 					}
 
-					std::vector<Connection> my_conn_list = roads_list_.at(i).GetLastSectionConnections();
+					std::vector<Connection> my_conn_list = roads_list_.at(i).getLastSectionConnections();
 					for(unsigned k=0; k < my_conn_list.size(); k++)
 					{
 						my_conn_list.at(k).outgoing_road_ = p_suc_road->id_;
-						roads_list_.at(i).InsertUniqueToConnection(my_conn_list .at(k));
+						roads_list_.at(i).insertUniqueToConnection(my_conn_list .at(k));
 					}
 				}
 			}
@@ -254,16 +254,16 @@ void OpenDriveLoader::ConnectRoads()
 		for(unsigned int j=0; j < junctions_list_.at(i).connections_.size(); j++)
 		{
 			//std::cout << "J_ID: " << junctions_list_.at(i).id_ << ", (" << junctions_list_.at(i).connections_.at(j).incoming_road_ << ", " << junctions_list_.at(i).connections_.at(j).outgoing_road_ << " )" <<std::endl;
-			OpenDriveRoad* p_from_road = GetRoadById(junctions_list_.at(i).connections_.at(j).incoming_road_);
+			OpenDriveRoad* p_from_road = getRoadById(junctions_list_.at(i).connections_.at(j).incoming_road_);
 			if(p_from_road != nullptr)
 			{
-				p_from_road->InsertUniqueToConnection(junctions_list_.at(i).connections_.at(j));
+				p_from_road->insertUniqueToConnection(junctions_list_.at(i).connections_.at(j));
 			}
 
-			OpenDriveRoad* p_to_road = GetRoadById(junctions_list_.at(i).connections_.at(j).outgoing_road_);
+			OpenDriveRoad* p_to_road = getRoadById(junctions_list_.at(i).connections_.at(j).outgoing_road_);
 			if(p_to_road != nullptr)
 			{
-				p_to_road->InsertUniqueFromConnection(junctions_list_.at(i).connections_.at(j));
+				p_to_road->insertUniqueFromConnection(junctions_list_.at(i).connections_.at(j));
 			}
 		}
 	}
@@ -273,16 +273,16 @@ void OpenDriveLoader::ConnectRoads()
 	{
 		if(roads_list_.at(i).predecessor_road_.size() > 0)
 		{
-			if(roads_list_.at(i).predecessor_road_.at(0).link_type != ROAD_LINK)
+			if(roads_list_.at(i).predecessor_road_.at(0).link_type_ != ROAD_LINK)
 			{
-				std::vector<OpenDriveRoad*> pred_list = GetRoadsBySuccId(roads_list_.at(i).id_);
+				std::vector<OpenDriveRoad*> pred_list = getRoadsBySuccId(roads_list_.at(i).id_);
 				for(unsigned int j=0; j < pred_list.size(); j++)
 				{
-					for(unsigned int k=0; k < pred_list.at(j)->to_roads.size(); k++)
+					for(unsigned int k=0; k < pred_list.at(j)->to_roads_.size(); k++)
 					{
-						if(pred_list.at(j)->to_roads.at(k).outgoing_road_ == roads_list_.at(i).id_)
+						if(pred_list.at(j)->to_roads_.at(k).outgoing_road_ == roads_list_.at(i).id_)
 						{
-							roads_list_.at(i).InsertUniqueFromConnection(pred_list.at(j)->to_roads.at(k));
+							roads_list_.at(i).insertUniqueFromConnection(pred_list.at(j)->to_roads_.at(k));
 						}
 					}
 				}
@@ -291,41 +291,41 @@ void OpenDriveLoader::ConnectRoads()
 	}
 }
 
-void OpenDriveLoader::GetMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, const double& resolution)
+void OpenDriveLoader::getMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, double resolution)
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
-		roads_list_.at(i).GetRoadLanes(all_lanes, resolution);
+		roads_list_.at(i).getRoadLanes(all_lanes, resolution);
 	}
 }
 
-void OpenDriveLoader::GetTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights)
+void OpenDriveLoader::getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights)
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
-		roads_list_.at(i).GetTrafficLights(all_lights);
+		roads_list_.at(i).getTrafficLights(all_lights);
 	}
 }
 
-void OpenDriveLoader::GetTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs)
+void OpenDriveLoader::getTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs)
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
-		roads_list_.at(i).GetTrafficSigns(all_signs);
+		roads_list_.at(i).getTrafficSigns(all_signs);
 	}
 }
 
-void OpenDriveLoader::GetStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines)
+void OpenDriveLoader::getStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines)
 {
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
-		roads_list_.at(i).GetStopLines(all_stop_lines);
+		roads_list_.at(i).getStopLines(all_stop_lines);
 	}
 }
 
-void OpenDriveLoader::LinkWayPoints(PlannerHNS::RoadNetwork& map)
+void OpenDriveLoader::linkWayPoints(PlannerHNS::RoadNetwork& map)
 {
-	PlannerHNS::MappingHelpers::LinkLanesPointers(map);
+	linkLanesPointers(map);
 
 	for(unsigned int rs = 0; rs < map.roadSegments.size(); rs++)
 	{
@@ -348,6 +348,44 @@ void OpenDriveLoader::LinkWayPoints(PlannerHNS::RoadNetwork& map)
 						}
 					}
 				}
+			}
+		}
+	}
+}
+
+void OpenDriveLoader::linkLanesPointers(PlannerHNS::RoadNetwork& map)
+{
+	for(unsigned int rs = 0; rs < map.roadSegments.size(); rs++)
+	{
+		//Link Lanes
+		for(unsigned int i =0; i < map.roadSegments.at(rs).Lanes.size(); i++)
+		{
+			PlannerHNS::Lane* pL = &map.roadSegments.at(rs).Lanes.at(i);
+			for(unsigned int j = 0 ; j < pL->fromIds.size(); j++)
+			{
+				for(unsigned int l= 0; l < map.roadSegments.at(rs).Lanes.size(); l++)
+				{
+					if(map.roadSegments.at(rs).Lanes.at(l).id == pL->fromIds.at(j))
+					{
+						pL->fromLanes.push_back(&map.roadSegments.at(rs).Lanes.at(l));
+					}
+				}
+			}
+
+			for(unsigned int j = 0 ; j < pL->toIds.size(); j++)
+			{
+				for(unsigned int l= 0; l < map.roadSegments.at(rs).Lanes.size(); l++)
+				{
+					if(map.roadSegments.at(rs).Lanes.at(l).id == pL->toIds.at(j))
+					{
+						pL->toLanes.push_back(&map.roadSegments.at(rs).Lanes.at(l));
+					}
+				}
+			}
+
+			for(unsigned int j = 0 ; j < pL->points.size(); j++)
+			{
+				pL->points.at(j).pLane  = pL;
 			}
 		}
 	}

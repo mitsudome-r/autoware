@@ -10,7 +10,7 @@
 
 namespace autoware_map
 {
-void XmlHelpers::FindElements(const std::string& name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list)
+void XmlHelpers::findElements(std::string name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list)
 {
 	if(parent_element == nullptr)
 		return;
@@ -19,31 +19,26 @@ void XmlHelpers::FindElements(const std::string& name, TiXmlElement* parent_elem
 		element_list.push_back(parent_element);
 	}
 
-	//std::cout << "Num:" << element_list.size() << ", main element: " <<  parent_element->Value() << std::endl;
-
-	FindElements(name, parent_element->FirstChildElement(), element_list);
-	FindElements(name, parent_element->NextSiblingElement(), element_list);
+	findElements(name, parent_element->FirstChildElement(), element_list);
+	findElements(name, parent_element->NextSiblingElement(), element_list);
 
 }
 
-void XmlHelpers::FindFirstElement(const std::string& name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list)
+void XmlHelpers::findFirstElement(std::string name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list)
 {
 	if(parent_element == nullptr  || element_list.size()>0)
 		return;
 	else if(name.compare(parent_element->Value()) == 0)
 	{
 		element_list.push_back(parent_element);
-	//	std::cout << "Name:" << name << " Found Found " << element_list.size() << std::endl;
 		return;
 	}
 
-//	std::cout << "Name:" << name << " Not Found " << element_list.size() << std::endl;
-
-	FindFirstElement(name, parent_element->FirstChildElement(), element_list);
-	FindFirstElement(name, parent_element->NextSiblingElement(), element_list);
+	findFirstElement(name, parent_element->FirstChildElement(), element_list);
+	findFirstElement(name, parent_element->NextSiblingElement(), element_list);
 }
 
-int XmlHelpers::GetIntAttribute(TiXmlElement* p_elem, std::string name, int def_val )
+int XmlHelpers::getIntAttribute(TiXmlElement* p_elem, std::string name, int def_val )
 {
 	if(p_elem != nullptr && p_elem->Attribute(name) != nullptr)
 		return strtol(p_elem->Attribute(name.c_str()), NULL, 10);
@@ -51,7 +46,7 @@ int XmlHelpers::GetIntAttribute(TiXmlElement* p_elem, std::string name, int def_
 		return def_val;
 }
 
-double XmlHelpers::GetDoubleAttribute(TiXmlElement* p_elem, std::string name, double def_val )
+double XmlHelpers::getDoubleAttribute(TiXmlElement* p_elem, std::string name, double def_val )
 {
 	if(p_elem != nullptr && p_elem->Attribute(name) != nullptr)
 		return strtod(p_elem->Attribute(name.c_str()), NULL);
@@ -59,7 +54,7 @@ double XmlHelpers::GetDoubleAttribute(TiXmlElement* p_elem, std::string name, do
 		return def_val;
 }
 
-std::string XmlHelpers::GetStringAttribute(TiXmlElement* p_elem, std::string name, std::string def_val)
+std::string XmlHelpers::getStringAttribute(TiXmlElement* p_elem, std::string name, std::string def_val)
 {
 	if(p_elem != nullptr && p_elem->Attribute(name) != nullptr)
 		return std::string(p_elem->Attribute(name.c_str()));
@@ -67,7 +62,7 @@ std::string XmlHelpers::GetStringAttribute(TiXmlElement* p_elem, std::string nam
 		return def_val;
 }
 
-std::string XmlHelpers::GetStringValue(TiXmlElement* p_elem, std::string def_val)
+std::string XmlHelpers::getStringValue(TiXmlElement* p_elem, std::string def_val)
 {
 	if(p_elem != nullptr && p_elem->Value() != nullptr)
 		return p_elem->ValueStr();

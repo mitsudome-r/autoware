@@ -40,50 +40,50 @@ namespace autoware_map
 class FromRoadLink
 {
 public:
-	LINK_TYPE link_type;
-	int from_road_id;
-	CONTACT_POINT contact_point;
+	LINK_TYPE link_type_;
+	int from_road_id_;
+	CONTACT_POINT contact_point_;
 
 	FromRoadLink(TiXmlElement* main_element)
 	{
-		if(XmlHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
-			link_type = ROAD_LINK;
+		if(XmlHelpers::getStringAttribute(main_element, "elementType", "").compare("road") == 0)
+			link_type_ = ROAD_LINK;
 		else
-			link_type = JUNCTION_LINK;
+			link_type_ = JUNCTION_LINK;
 
-		from_road_id = XmlHelpers::GetIntAttribute(main_element, "elementId", 0);
+		from_road_id_ = XmlHelpers::getIntAttribute(main_element, "elementId", 0);
 
-		if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
-			contact_point = START_POINT;
-		else if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
-			contact_point = END_POINT;
+		if(XmlHelpers::getStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
+			contact_point_ = START_POINT;
+		else if(XmlHelpers::getStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
+			contact_point_ = END_POINT;
 		else
-			contact_point = EMPTY_POINT;
+			contact_point_ = EMPTY_POINT;
 	}
 };
 
 class ToRoadLink
 {
 public:
-	LINK_TYPE link_type;
-	int to_road_id;
-	CONTACT_POINT contact_point;
+	LINK_TYPE link_type_;
+	int to_road_id_;
+	CONTACT_POINT contact_point_;
 
 	ToRoadLink(TiXmlElement* main_element)
 	{
-		if(XmlHelpers::GetStringAttribute(main_element, "elementType", "").compare("road") == 0)
-			link_type = ROAD_LINK;
+		if(XmlHelpers::getStringAttribute(main_element, "elementType", "").compare("road") == 0)
+			link_type_ = ROAD_LINK;
 		else
-			link_type = JUNCTION_LINK;
+			link_type_ = JUNCTION_LINK;
 
-		to_road_id = XmlHelpers::GetIntAttribute(main_element, "elementId", 0);
+		to_road_id_ = XmlHelpers::getIntAttribute(main_element, "elementId", 0);
 
-		if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
-			contact_point = START_POINT;
-		else if(XmlHelpers::GetStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
-			contact_point = END_POINT;
+		if(XmlHelpers::getStringAttribute(main_element, "contactPoint", "").compare("start") == 0)
+			contact_point_ = START_POINT;
+		else if(XmlHelpers::getStringAttribute(main_element, "contactPoint", "").compare("end") == 0)
+			contact_point_ = END_POINT;
 		else
-			contact_point = EMPTY_POINT;
+			contact_point_ = EMPTY_POINT;
 	}
 };
 
@@ -106,18 +106,18 @@ public:
 	std::vector<RoadObjectRef> road_objects_references_;
 	std::vector<RoadObjectTunnel> road_objects_tunnels_;
 	std::vector<RoadObjectBridge> road_objects_bridges_;
-	std::vector<Connection> to_roads;
-	std::vector<Connection> from_roads;
+	std::vector<Connection> to_roads_;
+	std::vector<Connection> from_roads_;
 
 
-	std::vector<Connection> GetFirstSectionConnections();
-	std::vector<Connection> GetLastSectionConnections();
-	void GetRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, const double& resolution = 0.5);
-	void GetTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
-	void GetTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
-	void GetStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
-	void InsertUniqueToConnection(const Connection& _connection);
-	void InsertUniqueFromConnection(const Connection& _connection);
+	std::vector<Connection> getFirstSectionConnections();
+	std::vector<Connection> getLastSectionConnections();
+	void getRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, double resolution = 0.5);
+	void getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
+	void getTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
+	void getStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
+	void insertUniqueToConnection(const Connection& _connection);
+	void insertUniqueFromConnection(const Connection& _connection);
 
 	OpenDriveRoad()
 	{
@@ -130,7 +130,7 @@ public:
 	OpenDriveRoad(TiXmlElement* main_element);
 
 private:
-	Geometry* GetMatchingGeometry(const double& sOffset)
+	Geometry* getMatchingGeometry(const double& sOffset)
 	{
 		for(unsigned int i=0; i < geometries_.size(); i++)
 		{
@@ -143,7 +143,7 @@ private:
 		return nullptr;
 	}
 
-	Elevation* GetMatchingElevations(const double& sOffset)
+	Elevation* getMatchingElevations(const double& sOffset)
 	{
 		if(elevations_.size() == 0)
 			return nullptr;
@@ -162,7 +162,7 @@ private:
 		return &elevations_.at(elevations_.size()-1);
 	}
 
-	LaneOffset* GetMatchingLaneOffset(const double& sOffset)
+	LaneOffset* getMatchingLaneOffset(const double& sOffset)
 	{
 		if(laneOffsets_.size() == 0)
 			return nullptr;
@@ -181,7 +181,7 @@ private:
 		return &laneOffsets_.at(laneOffsets_.size()-1);
 	}
 
-	RoadSection* GetMatchingSection(const double& sOffset)
+	RoadSection* getMatchingSection(const double& sOffset)
 	{
 		if(sections_.size() == 0)
 			return nullptr;
@@ -200,21 +200,21 @@ private:
 		return &sections_.at(sections_.size()-1);
 	}
 
-	bool CreateSingleCenterPoint(const double& _ds, PlannerHNS::WayPoint& _p);
+	bool createSingleCenterPoint(double _ds, PlannerHNS::WayPoint& _p);
 
-	void InsertUniqueFromSectionIds(const int& from_section_id, const OpenDriveLane* curr_lane, PlannerHNS::Lane& _l);
-	void InsertUniqueToSectionIds(const int& to_section_id, const OpenDriveLane* curr_lane, PlannerHNS::Lane& _l);
+	void insertUniqueFromSectionIds(int from_section_id, const OpenDriveLane* curr_lane, PlannerHNS::Lane& _l);
+	void insertUniqueToSectionIds(int to_section_id, const OpenDriveLane* curr_lane, PlannerHNS::Lane& _l);
 
-	void InsertUniqueFromRoadIds(const int& curr_section_id, const int& curr_lane_id, PlannerHNS::Lane& _l);
-	void InsertUniqueToRoadIds(const int& curr_section_id, const int& curr_lane_id, PlannerHNS::Lane& _l);
-
-
+	void insertUniqueFromRoadIds(int curr_section_id, int curr_lane_id, PlannerHNS::Lane& _l);
+	void insertUniqueToRoadIds(int curr_section_id, int curr_lane_id, PlannerHNS::Lane& _l);
 
 
-	void CreateRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list);
-	void CreateRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, const double& resolution = 0.5);
 
-	PlannerHNS::Lane* GetLaneById(const int& _l_id, std::vector<PlannerHNS::Lane>& _lanes_list)
+
+	void createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list);
+	void createRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, double resolution = 0.5);
+
+	PlannerHNS::Lane* getLaneById(const int& _l_id, std::vector<PlannerHNS::Lane>& _lanes_list)
 	{
 		for(unsigned int i=0; i < _lanes_list.size(); i++)
 		{
@@ -225,7 +225,7 @@ private:
 		return nullptr;
 	}
 
-	RoadSection* GetFirstSection()
+	RoadSection* getFirstSection()
 	{
 		if(sections_.size() == 0)
 			return nullptr;
@@ -233,7 +233,7 @@ private:
 		return &sections_.at(0);
 	}
 
-	RoadSection* GetLastSection()
+	RoadSection* getLastSection()
 	{
 		if(sections_.size() == 0)
 			return nullptr;
@@ -241,7 +241,7 @@ private:
 		return &sections_.at(sections_.size()-1);
 	}
 
-	bool Exists(const std::vector<int>& _list, const int& _val)
+	bool exists(const std::vector<int>& _list, int _val)
 	{
 		for(unsigned int j=0; j< _list.size(); j++)
 		{

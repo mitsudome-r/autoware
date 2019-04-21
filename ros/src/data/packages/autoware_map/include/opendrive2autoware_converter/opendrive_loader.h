@@ -41,24 +41,25 @@ class OpenDriveLoader
 public:
 	OpenDriveLoader();
     ~OpenDriveLoader();
-    void loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map,const double& resolution = 0.5);
-    void GetMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, const double& resolution = 0.5);
-    void GetTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
-    void GetTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
-    void GetStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
-    void ConnectRoads();
+    void loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map,double resolution = 0.5);
+    void getMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, double resolution = 0.5);
+    void getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
+    void getTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
+    void getStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lines);
+    void connectRoads();
 
 private:
     std::vector<OpenDriveRoad> roads_list_;
     std::vector<Junction> junctions_list_;
 
 
-    std::vector<OpenDriveRoad*> GetRoadsBySuccId(const int& _id);
-    std::vector<OpenDriveRoad*> GetRoadsByPredId(const int& _id);
+    std::vector<OpenDriveRoad*> getRoadsBySuccId(int _id);
+    std::vector<OpenDriveRoad*> getRoadsByPredId(int _id);
 
-    OpenDriveRoad* GetRoadById(const int& _id);
-    Junction* GetJunctionById(const int& _id);
-    void LinkWayPoints(PlannerHNS::RoadNetwork& map);
+    OpenDriveRoad* getRoadById(int _id);
+    Junction* getJunctionById(int _id);
+    void linkWayPoints(PlannerHNS::RoadNetwork& map);
+    void linkLanesPointers(PlannerHNS::RoadNetwork& map);
 };
 
 }

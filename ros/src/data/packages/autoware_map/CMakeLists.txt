@@ -32,7 +32,7 @@ add_library( autoware_map lib/autoware_map/autoware_map.cpp
                 			lib/autoware_map/opendrive_loader.cpp
                 			lib/autoware_map/map_writer.cpp
                 			lib/autoware_map/xml_helpers.cpp
-                			lib/autoware_map/odrSpiral.cpp
+                			lib/autoware_map/odr_spiral.cpp
                 			lib/autoware_map/opendrive_road.cpp
                 			lib/autoware_map/opendrive_objects.cpp)
 add_dependencies( autoware_map ${catkin_EXPORTED_TARGETS} )

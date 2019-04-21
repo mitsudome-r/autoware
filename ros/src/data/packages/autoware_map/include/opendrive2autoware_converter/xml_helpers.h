@@ -31,7 +31,16 @@
 #ifndef XML_HELPERS_H
 #define XML_HELPERS_H
 
-#include "op_planner/MappingHelpers.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <iostream>
+#include <limits>
+#include <algorithm>
+
+#include "op_planner/RoadNetwork.h"
+#include "tinyxml.h"
 
 namespace autoware_map
 {
@@ -40,14 +49,69 @@ class XmlHelpers
 
 public:
 
-	static void FindElements(const std::string& name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list);
-	static void FindFirstElement(const std::string& name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list);
-	static int GetIntAttribute(TiXmlElement* p_elem, std::string name, int def_val = 0);
-	static double GetDoubleAttribute(TiXmlElement* p_elem, std::string name, double def_val = 0.0);
-	static std::string GetStringAttribute(TiXmlElement* p_elem, std::string name, std::string def_val);
-	static std::string GetStringValue(TiXmlElement* p_elem, std::string def_val);
+	static void findElements(std::string name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list);
+	static void findFirstElement(std::string name, TiXmlElement* parent_element, std::vector<TiXmlElement*>& element_list);
+	static int getIntAttribute(TiXmlElement* p_elem, std::string name, int def_val = 0);
+	static double getDoubleAttribute(TiXmlElement* p_elem, std::string name, double def_val = 0.0);
+	static std::string getStringAttribute(TiXmlElement* p_elem, std::string name, std::string def_val);
+	static std::string getStringValue(TiXmlElement* p_elem, std::string def_val);
+};
+
+class Mat3
+{
+	double m[3][3];
+
+public:
+	Mat3()
+	{
+		for(unsigned int i=0;i<3;i++)
+		{
+			for(unsigned int j=0;j<3;j++)
+			{
+				m[i][j] = 0;
+			}
+		}
+
+		m[0][0] = m[1][1] = m[2][2] = 1;
+	}
+
+	Mat3(double transX, double transY)
+	{
+		m[0][0] = 1; m[0][1] =  0; m[0][2] =  transX;
+		m[1][0] = 0; m[1][1] =  1; m[1][2] =  transY;
+		m[2][0] = 0; m[2][1] =  0; m[2][2] =  1;
+	}
+
+	Mat3(double rotation_angle)
+	{
+		double c = cos(rotation_angle);
+		double s = sin(rotation_angle);
+		m[0][0] = c; m[0][1] = -s; m[0][2] =  0;
+		m[1][0] = s; m[1][1] =  c; m[1][2] =  0;
+		m[2][0] = 0; m[2][1] =  0; m[2][2] =  1;
+	}
+
+	Mat3(PlannerHNS::GPSPoint rotationCenter)
+	{
+		double c = cos(rotationCenter.a);
+		double s = sin(rotationCenter.a);
+		double u = rotationCenter.x;
+		double v = rotationCenter.y;
+		m[0][0] = c; m[0][1] = -s; m[0][2] = -u*c + v*s + u;
+		m[1][0] = s; m[1][1] =  c; m[1][2] = -u*s - v*c + v;
+		m[2][0] = 0; m[2][1] =  0; m[2][2] =  1;
+	}
+
+
+	PlannerHNS::GPSPoint operator * (PlannerHNS::GPSPoint v)
+	{
+		PlannerHNS::GPSPoint _v = v;
+		v.x = m[0][0]*_v.x + m[0][1]*_v.y + m[0][2]*1;
+		v.y = m[1][0]*_v.x + m[1][1]*_v.y + m[1][2]*1;
+		return v;
+	}
 };
 
 }
 
-#endif // XML_HELPERS_H
+#endif

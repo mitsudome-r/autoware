@@ -38,7 +38,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <math.h>
-#include "opendrive2autoware_converter/odrSpiral.h"
+#include "opendrive2autoware_converter/odr_spiral.h"
 
 /* ====== LOCAL VARIABLES ====== */
 

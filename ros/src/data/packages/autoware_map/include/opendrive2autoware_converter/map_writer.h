@@ -41,14 +41,14 @@ class MapWriter
 public:
 	MapWriter();
     ~MapWriter();
-    void writeAutowareMap(const std::string& folder_name, PlannerHNS::RoadNetwork& map);
+    void writeAutowareMap(std::string folder_name, PlannerHNS::RoadNetwork& map);
 
 
 private:
 
 	template <class T>
-	void WriteCSVFile(const std::string& folder, const std::string& title, const std::string& header, const std::vector<T>& data_list);
-	PlannerHNS::Lane* GetLaneFromID(PlannerHNS::RoadNetwork& map, int _l_id)
+	void writeCSVFile(const std::string& folder, const std::string& title, const std::string& header, const std::vector<T>& data_list);
+	PlannerHNS::Lane* getLaneFromID(PlannerHNS::RoadNetwork& map, int _l_id)
 	{
 		for(unsigned int i=0; i<map.roadSegments.size(); i++)
 		{

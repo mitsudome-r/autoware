@@ -6,7 +6,7 @@
  */
 
 #include "opendrive2autoware_converter/map_writer.h"
-#include "op_planner/MappingHelpers.h"
+#include "op_planner/RoadNetwork.h"
 #include <fstream>
 
 #include <autoware_map_msgs/LaneArray.h>
@@ -40,17 +40,17 @@ MapWriter::~MapWriter()
 }
 
 template <class T>
-void MapWriter::WriteCSVFile(const std::string& folder, const std::string& title, const std::string& header, const std::vector<T>& data_list)
+void MapWriter::writeCSVFile(const std::string& folder, const std::string& title, const std::string& header, const std::vector<T>& data_list)
 {
 	if(data_list.size() < 2)
 			return;
 
-	std::ostringstream fileName;
-	fileName << folder;
-	fileName << title;
-	fileName << ".csv";
+	std::ostringstream file_name;
+	file_name << folder;
+	file_name << title;
+	file_name << ".csv";
 
-	std::ofstream f(fileName.str().c_str());
+	std::ofstream f(file_name.str().c_str());
 
 	if(f.is_open())
 	{
@@ -63,7 +63,7 @@ void MapWriter::WriteCSVFile(const std::string& folder, const std::string& title
 	f.close();
 }
 
-void MapWriter::writeAutowareMap(const std::string& folder_name, PlannerHNS::RoadNetwork& map)
+void MapWriter::writeAutowareMap(std::string folder_name, PlannerHNS::RoadNetwork& map)
 {
 	if(map.roadSegments.size() == 0)
 	{
@@ -204,7 +204,7 @@ void MapWriter::writeAutowareMap(const std::string& folder_name, PlannerHNS::Roa
 		for(unsigned int j=0; j < p_light->laneIds.size(); j++)
 		{
 			autoware_map_msgs::WaypointSignalRelation wp_s_r;
-			PlannerHNS::Lane* p_op_lane = GetLaneFromID(map, p_light->laneIds.at(j));
+			PlannerHNS::Lane* p_op_lane = getLaneFromID(map, p_light->laneIds.at(j));
 			if(p_op_lane != nullptr)
 			{
 				wp_s_r.signal_id = sl.signal_id;
@@ -235,24 +235,24 @@ void MapWriter::writeAutowareMap(const std::string& folder_name, PlannerHNS::Roa
 	}
 
 
-	WriteCSVFile(folder_name, "points", "point_id,x,y,z,lat,lng,pcd,mgrs,epsg", points_list.data);
+	writeCSVFile(folder_name, "points", "point_id,x,y,z,lat,lng,pcd,mgrs,epsg", points_list.data);
 
-	WriteCSVFile(folder_name, "lanes", "lane_id,start_waypoint_id,end_waypoint_id,"
+	writeCSVFile(folder_name, "lanes", "lane_id,start_waypoint_id,end_waypoint_id,"
 			"lane_number,num_of_lanes,speed_limit,length,width_limit,height_limit,weight_limit", lanes_list.data);
 
-	WriteCSVFile(folder_name, "lane_relations", "lane_id,next_lane_id,blinker", lane_relations_list.data);
+	writeCSVFile(folder_name, "lane_relations", "lane_id,next_lane_id,blinker", lane_relations_list.data);
 
-	WriteCSVFile(folder_name, "waypoints", "waypoint_id,point_id,velocity,stop_line,left_width,right_width,height", waypoints_list.data);
+	writeCSVFile(folder_name, "waypoints", "waypoint_id,point_id,velocity,stop_line,left_width,right_width,height", waypoints_list.data);
 
-	WriteCSVFile(folder_name, "waypoint_relations", "waypoint_id,next_waypoint_id,yaw,blinker,distance", wp_relations_list.data);
+	writeCSVFile(folder_name, "waypoint_relations", "waypoint_id,next_waypoint_id,yaw,blinker,distance", wp_relations_list.data);
 
-	WriteCSVFile(folder_name, "waypoint_lane_relations", "waypoint_id,lane_id,order", wp_lanes_relations_list.data);
+	writeCSVFile(folder_name, "waypoint_lane_relations", "waypoint_id,lane_id,order", wp_lanes_relations_list.data);
 
-	WriteCSVFile(folder_name, "signals", "signal_id", signals_list.data);
+	writeCSVFile(folder_name, "signals", "signal_id", signals_list.data);
 
-	WriteCSVFile(folder_name, "signal_lights", "signal_light_id,signal_id,point_id,horizontal_angle,vertical_angle,color_type,arrow_type", lights_list.data);
+	writeCSVFile(folder_name, "signal_lights", "signal_light_id,signal_id,point_id,horizontal_angle,vertical_angle,color_type,arrow_type", lights_list.data);
 
-	WriteCSVFile(folder_name, "waypoint_signal_relations", "waypoint_id,signal_id", wp_lights_relations_list.data);
+	writeCSVFile(folder_name, "waypoint_signal_relations", "waypoint_id,signal_id", wp_lights_relations_list.data);
 
 	std::cout << "Finish Writing map files .csv to folder: " << folder_name << std::endl;
 }

@@ -11,12 +11,13 @@
 namespace autoware_map
 {
 
-OpenDriveRoad::OpenDriveRoad(TiXmlElement* main_element)
+OpenDriveRoad::OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes)
 {
 	name_ = XmlHelpers::getStringAttribute(main_element, "name", "");
 	id_ = XmlHelpers::getIntAttribute(main_element, "id", 0);
 	junction_id_ = XmlHelpers::getIntAttribute(main_element, "junction", -1);
 	length_ = XmlHelpers::getDoubleAttribute(main_element, "length", 0.0);
+	p_country_signal_codes_ = country_signal_codes;
 
 	//Read Links
 	std::vector<TiXmlElement*> sub_elements;
@@ -662,11 +663,212 @@ std::vector<Connection> OpenDriveRoad::getFirstSectionConnections()
 	return connections_list;
 }
 
+OBJECT_TYPE OpenDriveRoad::getObjTypeFromText(const std::string& autoware_type)
+{
+	if(autoware_type.compare("TRAFFIC_LIGHT"))
+	{
+		return TRAFFIC_LIGHT;
+	}
+	else if(autoware_type.compare("ROAD_SIGN"))
+	{
+		return ROAD_SIGN;
+	}
+	else if(autoware_type.compare("ROAD_MARK"))
+	{
+		return ROAD_MARK;
+	}
+	else
+	{
+		return UNKNOWN_OBJECT;
+	}
+}
+
+OBJECT_TYPE OpenDriveRoad::getAutowareMainTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type)
+{
+	if(p_country_signal_codes_ != nullptr)
+	{
+		for(unsigned int i=0; i < p_country_signal_codes_->size(); i++)
+		{
+			if(p_country_signal_codes_->at(i).first.compare(country_code) == 0)
+			{
+				for(unsigned int j=0; j < p_country_signal_codes_->at(i).second.size(); j++)
+				{
+					if(p_country_signal_codes_->at(i).second.at(j).id_.compare(type) == 0 &&
+							p_country_signal_codes_->at(i).second.at(j).sub_id_.compare(sub_type) == 0)
+					{
+						return getObjTypeFromText(p_country_signal_codes_->at(i).second.at(j).gen_type_);
+					}
+				}
+			}
+		}
+	}
+
+	return UNKNOWN_OBJECT;
+}
+
+TRAFFIC_LIGHT_TYPE OpenDriveRoad::getLightTypeFromText(const std::string& autoware_type)
+{
+	if(autoware_type.compare("VERTICAL_DEFAULT_LIGHT"))
+	{
+		return VERTICAL_DEFAULT_LIGHT;
+	}
+	else if(autoware_type.compare("HORIZONTAL_DEFAULTLIGHT"))
+	{
+		return HORIZONTAL_DEFAULTLIGHT;
+	}
+	else if(autoware_type.compare("PEDESTRIAN_DEFAULT_LIGHT"))
+	{
+		return PEDESTRIAN_DEFAULT_LIGHT;
+	}
+	else
+	{
+		return UNKNOWN_LIGHT;
+	}
+}
+
+TRAFFIC_LIGHT_TYPE OpenDriveRoad::getAutowareLightTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type)
+{
+	if(p_country_signal_codes_ != nullptr)
+	{
+		for(unsigned int i=0; i < p_country_signal_codes_->size(); i++)
+		{
+			if(p_country_signal_codes_->at(i).first.compare(country_code) == 0)
+			{
+				for(unsigned int j=0; j < p_country_signal_codes_->at(i).second.size(); j++)
+				{
+					if(p_country_signal_codes_->at(i).second.at(j).id_.compare(type) == 0 &&
+							p_country_signal_codes_->at(i).second.at(j).sub_id_.compare(sub_type) == 0)
+					{
+						return getLightTypeFromText(p_country_signal_codes_->at(i).second.at(j).gen_sub_type_);
+					}
+				}
+			}
+		}
+	}
+
+	return UNKNOWN_LIGHT;
+}
+
+ROAD_SIGN_TYPE OpenDriveRoad::getSignTypeFromText(const std::string& autoware_type)
+{
+	if(autoware_type.compare("SPEED_LIMIT_SIGN"))
+	{
+		return SPEED_LIMIT_SIGN;
+	}
+	else if(autoware_type.compare("STOP_SIGN"))
+	{
+		return STOP_SIGN;
+	}
+	else if(autoware_type.compare("NO_PARKING_SIGN"))
+	{
+		return NO_PARKING_SIGN;
+	}
+	else
+	{
+		return UNKNOWN_SIGN;
+	}
+}
+
+ROAD_SIGN_TYPE OpenDriveRoad::getAutowareRoadSignTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type)
+{
+	if(p_country_signal_codes_ != nullptr)
+	{
+		for(unsigned int i=0; i < p_country_signal_codes_->size(); i++)
+		{
+			if(p_country_signal_codes_->at(i).first.compare(country_code) == 0)
+			{
+				for(unsigned int j=0; j < p_country_signal_codes_->at(i).second.size(); j++)
+				{
+					if(p_country_signal_codes_->at(i).second.at(j).id_.compare(type) == 0 &&
+							p_country_signal_codes_->at(i).second.at(j).sub_id_.compare(sub_type) == 0)
+					{
+						return getSignTypeFromText(p_country_signal_codes_->at(i).second.at(j).gen_sub_type_);
+					}
+				}
+			}
+		}
+	}
+
+	return UNKNOWN_SIGN;
+
+}
+
+ROAD_MARK_TYPE OpenDriveRoad::getMarkTypeFromText(const std::string& autoware_type)
+{
+	if(autoware_type.compare("STOP_LINE_MARK"))
+	{
+		return STOP_LINE_MARK;
+	}
+	else if(autoware_type.compare("WAITING_LINE_MARK"))
+	{
+		return WAITING_LINE_MARK;
+	}
+	else if(autoware_type.compare("FORWARD_DIRECTION_MARK"))
+	{
+		return FORWARD_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("LEFT_DIRECTION_MARK"))
+	{
+		return LEFT_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("RIGHT_DIRECTION_MARK"))
+	{
+		return RIGHT_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("FORWARD_LEFT_DIRECTION_MARK"))
+	{
+		return FORWARD_LEFT_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("FORWARD_RIGHT_DIRECTION_MARK"))
+	{
+		return FORWARD_RIGHT_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("ALL_DIRECTION_MARK"))
+	{
+		return ALL_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("U_TURN_DIRECTION_MARK"))
+	{
+		return U_TURN_DIRECTION_MARK;
+	}
+	else if(autoware_type.compare("NO_U_TURN_DIRECTION_MARK"))
+	{
+		return NO_U_TURN_DIRECTION_MARK;
+	}
+	else
+	{
+		return UNKNOWN_ROAD_MARK;
+	}
+}
+
+ROAD_MARK_TYPE OpenDriveRoad::getAutowareRoadMarksTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type)
+{
+	if(p_country_signal_codes_ != nullptr)
+	{
+		for(unsigned int i=0; i < p_country_signal_codes_->size(); i++)
+		{
+			if(p_country_signal_codes_->at(i).first.compare(country_code) == 0)
+			{
+				for(unsigned int j=0; j < p_country_signal_codes_->at(i).second.size(); j++)
+				{
+					if(p_country_signal_codes_->at(i).second.at(j).id_.compare(type) == 0 &&
+							p_country_signal_codes_->at(i).second.at(j).sub_id_.compare(sub_type) == 0)
+					{
+						return getMarkTypeFromText(p_country_signal_codes_->at(i).second.at(j).gen_sub_type_);
+					}
+				}
+			}
+		}
+	}
+
+	return UNKNOWN_ROAD_MARK;
+}
+
 void OpenDriveRoad::getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights)
 {
 	for(unsigned int i=0; i<road_signals_.size(); i++)
 	{
-		if(road_signals_.at(i).type_ == TRAFFIC_LIGHT_1 || road_signals_.at(i).type_ == TRAFFIC_LIGHT_2 || road_signals_.at(i).type_ == TRAFFIC_LIGHT_3)
+		if(getAutowareMainTypeFromCode(road_signals_.at(i).country_code_, road_signals_.at(i).type_, road_signals_.at(i).sub_type_) == TRAFFIC_LIGHT)
 		{
 			PlannerHNS::TrafficLight tl;
 			tl.id = (this->id_*1000000) + road_signals_.at(i).id_ * 10;
@@ -707,7 +909,7 @@ void OpenDriveRoad::getStopLines(std::vector<PlannerHNS::StopLine>& all_stop_lin
 {
 	for(unsigned int i=0; i<road_signals_.size(); i++)
 	{
-		if(road_signals_.at(i).type_ == STOP_LINE_SIGNAL || road_signals_.at(i).type_ == WAIT_LINE_SIGNAL)
+		if(getAutowareMainTypeFromCode(road_signals_.at(i).country_code_, road_signals_.at(i).type_, road_signals_.at(i).sub_type_) ==  ROAD_MARK)
 		{
 			PlannerHNS::StopLine sl;
 			sl.id = (this->id_*1000000) + road_signals_.at(i).id_ * 10;

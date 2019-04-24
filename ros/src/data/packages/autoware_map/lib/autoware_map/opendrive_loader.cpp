@@ -21,8 +21,56 @@ OpenDriveLoader::~OpenDriveLoader()
 {
 }
 
-void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map, double resolution)
+void OpenDriveLoader::getFileNameInFolder(const std::string& path, std::vector<std::string>& out_list)
 {
+	out_list.clear();
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir (path.c_str())) != NULL)
+	{
+	  while ((ent = readdir (dir)) != NULL)
+	  {
+		  std::string str(ent->d_name);
+		  if(str.compare(".") !=0 && str.compare("..") !=0)
+			  out_list.push_back(path+str);
+	  }
+	  closedir (dir);
+	}
+}
+
+void OpenDriveLoader::loadCountryCods(const std::string& codes_csv_folder)
+{
+	if(codes_csv_folder.size() > 0)
+	{
+		std::vector<std::string> files_names;
+		getFileNameInFolder(codes_csv_folder, files_names);
+		country_signal_codes_.clear();
+
+		for(unsigned int i=0; i < files_names.size();i++)
+		{
+			CSV_Reader reader(files_names.at(i));
+			int i_ext_dot = files_names.at(i).find('.');
+			int i_last_folder = files_names.at(i).find_last_of('/')+1;
+			std::string country_code = files_names.at(i).substr(i_last_folder, i_ext_dot - i_last_folder);
+
+			std::cout << "Reading Country Codes file: " << country_code << std::endl;
+
+			std::vector<CSV_Reader::LINE_DATA> country_data;
+			reader.ReadAllData(country_data);
+
+			country_signal_codes_.push_back(std::make_pair(country_code, country_data));
+		}
+	}
+	else
+	{
+		std::cout << "No Signs will be recognized, no Country Code files at: " << codes_csv_folder << std::endl;
+	}
+}
+
+void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, const std::string& codes_folder, PlannerHNS::RoadNetwork& map, double resolution)
+{
+
+
 	std::ifstream f(xodr_file.c_str());
 	if(!f.good())
 	{
@@ -44,6 +92,7 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 		return;
 	}
 
+	loadCountryCods(codes_folder);
 
 	std::cout << " >> Reading Header Data from OpenDRIVE map file ... " << std::endl;
 	std::vector<TiXmlElement*> elements;
@@ -65,7 +114,7 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::Ro
 	roads_list_.clear();
 	for(unsigned int i=0; i < elements.size(); i++)
 	{
-		roads_list_.push_back(OpenDriveRoad(elements.at(i)));
+		roads_list_.push_back(OpenDriveRoad(elements.at(i), &country_signal_codes_));
 	}
 
 

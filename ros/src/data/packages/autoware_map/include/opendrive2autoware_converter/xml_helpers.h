@@ -112,6 +112,126 @@ public:
 	}
 };
 
+class CSV_Reader
+{
+private:
+	std::ifstream* p_file_;
+	std::vector<std::string> headers_;
+	std::vector<std::string> data_titles_header_;
+	std::vector<std::vector<std::vector<std::string> > > all_data_;
+
+	void ReadHeaders()
+	{
+		if(!p_file_->is_open()) return;
+		std::string strLine;
+		headers_.clear();
+		if(!p_file_->eof())
+		{
+			getline(*p_file_, strLine);
+			headers_.push_back(strLine);
+			ParseDataTitles(strLine);
+		}
+	}
+	void ParseDataTitles(const std::string& header)
+	{
+		if(header.size()==0) return;
+
+		std::string innerToken;
+		std::istringstream str_stream(header);
+		data_titles_header_.clear();
+		while(getline(str_stream, innerToken, ','))
+		{
+			data_titles_header_.push_back(innerToken);
+		}
+	}
+
+public:
+	struct LINE_DATA
+	{
+		std::string gen_type_;
+		std::string gen_sub_type_;
+		std::string id_;
+		std::string sub_id_;
+		std::string desc_;
+	};
+
+	CSV_Reader(std::string file_name)
+	{
+		p_file_ = new std::ifstream(file_name.c_str(), std::ios::in);
+	  if(!p_file_->is_open())
+	  {
+		  printf("\n Can't Open CSV File !, %s", file_name.c_str());
+		  return;
+	  }
+
+	  p_file_->precision(16);
+
+		ReadHeaders();
+
+	}
+
+	~CSV_Reader()
+	{
+		if(p_file_->is_open())
+			p_file_->close();
+	}
+
+	int ReadAllData(std::vector<LINE_DATA>& data_list)
+	{
+		data_list.clear();
+		LINE_DATA data;
+		int count = 0;
+		while(ReadNextLine(data))
+		{
+			data_list.push_back(data);
+			count++;
+		}
+		return count;
+	}
+
+	bool ReadSingleLine(std::vector<std::vector<std::string> >& line)
+	{
+		if(!p_file_->is_open() || p_file_->eof()) return false;
+
+			std::string strLine, innerToken;
+			line.clear();
+			getline(*p_file_, strLine);
+			std::istringstream str_stream(strLine);
+
+			std::vector<std::string> obj_part;
+
+			while(getline(str_stream, innerToken, ','))
+			{
+				obj_part.push_back(innerToken);
+			}
+
+			line.push_back(obj_part);
+			return true;
+	}
+
+	bool ReadNextLine(LINE_DATA& data)
+	{
+		std::vector<std::vector<std::string> > lineData;
+		if(ReadSingleLine(lineData))
+		{
+			if(lineData.size()==0) return false;
+			if(lineData.at(0).size() < 5) return false;
+
+			data.gen_type_ = lineData.at(0).at(0);
+			data.gen_sub_type_ = lineData.at(0).at(1);
+			data.id_ =   lineData.at(0).at(2);
+			data.sub_id_ =   lineData.at(0).at(3);
+			data.desc_ = lineData.at(0).at(4);
+
+			return true;
+
+		}
+		else
+			return false;
+	}
+
+};
+
 }
 
 #endif

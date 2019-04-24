@@ -34,7 +34,6 @@
 #include "op_planner/RoadNetwork.h"
 #include "time.h"
 #include "opendrive2autoware_converter/odr_spiral.h"
-//#include "op_planner/MatrixOperations.h"
 #include "opendrive2autoware_converter/xml_helpers.h"
 
 namespace autoware_map
@@ -47,9 +46,42 @@ enum GEOMETRY_TYPE {LINE_GEOMETRY, SPIRAL_GEOMETRY, ARC_GEOMETRY, POLY3_GEOMETRY
 	PARAM_POLY3_GEOMETRY, UNKNOWN_GEOMETRY };
 enum ELEVATION_TYPE {ELEVATION_PROFILE, LATERAL_PROFILE};
 enum LANE_DIRECTION {LEFT_LANE, RIGHT_LANE, CENTER_LANE };
-enum MARKING_TYPE {BROKEN_MARK, SOLID_MARK, NONE_MARK, UNKNOWN_MARK};
-enum SIGNAL_TYPE{TRAFFIC_LIGHT_1 = 1000001, TRAFFIC_LIGHT_2 = 1000002, TRAFFIC_LIGHT_3 = 1000003, STOP_LINE_SIGNAL = 294, WAIT_LINE_SIGNAL = 341, UNKNOWN_SIGNAL = 0};
-enum SIGNAL_SUBTYPE{};
+enum LINE_MARKING_TYPE {BROKEN_LINE_MARK, SOLID_LINE_MARK, NONE_LINE_MARK, UNKNOWN_LINE_MARK};
+//enum OBJECT_TYPE{TRAFFIC_LIGHT_1 = 1000001, TRAFFIC_LIGHT_2 = 1000002, TRAFFIC_LIGHT_3 = 1000003, STOP_LINE_SIGNAL = 294, WAIT_LINE_SIGNAL = 341, UNKNOWN_SIGNAL = 0};
+enum OBJECT_TYPE{
+	TRAFFIC_LIGHT,
+	ROAD_SIGN,
+	ROAD_MARK,
+	UNKNOWN_OBJECT};
+
+enum TRAFFIC_LIGHT_TYPE{
+	VERTICAL_DEFAULT_LIGHT,
+	HORIZONTAL_DEFAULTLIGHT,
+	PEDESTRIAN_DEFAULT_LIGHT,
+	UNKNOWN_LIGHT
+};
+
+enum ROAD_SIGN_TYPE{
+	SPEED_LIMIT_SIGN,
+	STOP_SIGN,
+	NO_PARKING_SIGN,
+	UNKNOWN_SIGN
+};
+
+enum ROAD_MARK_TYPE{
+	STOP_LINE_MARK,
+	WAITING_LINE_MARK,
+	FORWARD_DIRECTION_MARK,
+	LEFT_DIRECTION_MARK,
+	RIGHT_DIRECTION_MARK,
+	FORWARD_LEFT_DIRECTION_MARK,
+	FORWARD_RIGHT_DIRECTION_MARK,
+	ALL_DIRECTION_MARK,
+	U_TURN_DIRECTION_MARK,
+	NO_U_TURN_DIRECTION_MARK,
+	UNKNOWN_ROAD_MARK
+};
+
 enum ORIENTATION_TYPE{SAME_DIRECTION, OPPOSIT_DIRECTION, BOTH_DIRECTIONS};
 enum ROAD_OBJECT_TYPE{PARKING_SPACE_OBJ, UNKNOWN_ROAD_OBJ};
 enum LANE_TYPE { NONE_LANE, DRIVING_LANE, STOP_LANE, SHOULDER_LANE, BIKING_LANE,
@@ -178,7 +210,7 @@ class RoadMark
 {
 public:
 	double sOffset, width;
-	MARKING_TYPE type;
+	LINE_MARKING_TYPE type;
 	std::string weight;
 	std::string color;
 
@@ -192,19 +224,19 @@ public:
 
 		if(str_type.compare("broken")==0)
 		{
-			type = BROKEN_MARK;
+			type = BROKEN_LINE_MARK;
 		}
 		else if(str_type.compare("solid")==0)
 		{
-			type = SOLID_MARK;
+			type = SOLID_LINE_MARK;
 		}
 		else if(str_type.compare("none")==0)
 		{
-			type = NONE_MARK;
+			type = NONE_LINE_MARK;
 		}
 		else
 		{
-			type = UNKNOWN_MARK;
+			type = UNKNOWN_LINE_MARK;
 		}
 	}
 };
@@ -712,8 +744,8 @@ public:
 
 	bool dynamic_;
 	ORIENTATION_TYPE orientation_;
-	SIGNAL_TYPE type_;
-	int sub_type_;
+	std::string type_;
+	std::string sub_type_;
 
 	std::vector<int> valid_lanes_ids_;
 
@@ -721,7 +753,6 @@ public:
 	Signal(TiXmlElement* main_element)
 	{
 		orientation_ = BOTH_DIRECTIONS;
-		type_ = UNKNOWN_SIGNAL;
 
 		s_ = XmlHelpers::getDoubleAttribute(main_element, "s", 0);
 		t_ = XmlHelpers::getDoubleAttribute(main_element, "t", 0);
@@ -752,19 +783,19 @@ public:
 		else if(orientation_str.compare("-")==0)
 			orientation_ = OPPOSIT_DIRECTION;
 
-		sub_type_ = XmlHelpers::getIntAttribute(main_element, "subtype", 0);
+		type_ = XmlHelpers::getStringAttribute(main_element, "type", "");
+		sub_type_ = XmlHelpers::getStringAttribute(main_element, "subtype", "");
 
-		std::string type_str = XmlHelpers::getStringAttribute(main_element, "type", "");
-		if(type_str.compare("294")==0)
-			type_ = STOP_LINE_SIGNAL;
-		else if(type_str.compare("341")==0)
-			type_ = WAIT_LINE_SIGNAL;
-		else if(type_str.compare("1000001")==0)
-			type_ = TRAFFIC_LIGHT_1;
-		else if(type_str.compare("1000002")==0)
-			type_ = TRAFFIC_LIGHT_2;
-		else if(type_str.compare("1000003")==0)
-			type_ = TRAFFIC_LIGHT_3;
+//		if(type_str.compare("294")==0)
+//			type_ = STOP_LINE_SIGNAL;
+//		else if(type_str.compare("341")==0)
+//			type_ = WAIT_LINE_SIGNAL;
+//		else if(type_str.compare("1000001")==0)
+//			type_ = TRAFFIC_LIGHT_1;
+//		else if(type_str.compare("1000002")==0)
+//			type_ = TRAFFIC_LIGHT_2;
+//		else if(type_str.compare("1000003")==0)
+//			type_ = TRAFFIC_LIGHT_3;
 
 		if(main_element != nullptr)
 		{

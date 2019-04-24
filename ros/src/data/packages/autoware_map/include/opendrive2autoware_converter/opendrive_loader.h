@@ -32,6 +32,7 @@
 #define OPENDRIVE2AUTOWARE_CONVERTER
 
 #include "opendrive_road.h"
+#include "dirent.h"
 
 namespace autoware_map
 {
@@ -41,7 +42,9 @@ class OpenDriveLoader
 public:
 	OpenDriveLoader();
     ~OpenDriveLoader();
-    void loadOpenDRIVE(const std::string& xodr_file, PlannerHNS::RoadNetwork& map,double resolution = 0.5);
+    void getFileNameInFolder(const std::string& path, std::vector<std::string>& out_list);
+    void loadCountryCods(const std::string& codes_csv_folder);
+    void loadOpenDRIVE(const std::string& xodr_file, const std::string& codes_folder, PlannerHNS::RoadNetwork& map,double resolution = 0.5);
     void getMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, double resolution = 0.5);
     void getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
     void getTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
@@ -51,6 +54,7 @@ public:
 private:
     std::vector<OpenDriveRoad> roads_list_;
     std::vector<Junction> junctions_list_;
+    std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > > country_signal_codes_;
 
 
     std::vector<OpenDriveRoad*> getRoadsBySuccId(int _id);

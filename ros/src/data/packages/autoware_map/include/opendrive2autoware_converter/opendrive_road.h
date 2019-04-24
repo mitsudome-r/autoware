@@ -108,6 +108,7 @@ public:
 	std::vector<RoadObjectBridge> road_objects_bridges_;
 	std::vector<Connection> to_roads_;
 	std::vector<Connection> from_roads_;
+	std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* p_country_signal_codes_;
 
 
 	std::vector<Connection> getFirstSectionConnections();
@@ -121,13 +122,14 @@ public:
 
 	OpenDriveRoad()
 	{
+		p_country_signal_codes_ = nullptr;
 		id_ = 0;
 		junction_id_ = 0;
 		length_ = 0;
 
 	}
 
-	OpenDriveRoad(TiXmlElement* main_element);
+	OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes = nullptr);
 
 private:
 	Geometry* getMatchingGeometry(const double& sOffset)
@@ -253,6 +255,16 @@ private:
 
 		return false;
 	}
+
+	OBJECT_TYPE getAutowareMainTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type);
+	TRAFFIC_LIGHT_TYPE getAutowareLightTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type);
+	ROAD_SIGN_TYPE getAutowareRoadSignTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type);
+	ROAD_MARK_TYPE getAutowareRoadMarksTypeFromCode(const std::string& country_code, const std::string& type, const std::string& sub_type);
+
+	OBJECT_TYPE getObjTypeFromText(const std::string& autoware_type);
+	TRAFFIC_LIGHT_TYPE getLightTypeFromText(const std::string& autoware_type);
+	ROAD_SIGN_TYPE getSignTypeFromText(const std::string& autoware_type);
+	ROAD_MARK_TYPE getMarkTypeFromText(const std::string& autoware_type);
 
 };
 

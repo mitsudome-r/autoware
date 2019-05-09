@@ -11,6 +11,8 @@
 namespace autoware_map
 {
 
+double g_epsilon = 0.0000001;
+
 OpenDriveRoad::OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes)
 {
 	name_ = XmlHelpers::getStringAttribute(main_element, "name", "");
@@ -197,6 +199,59 @@ bool OpenDriveRoad::createSingleCenterPoint(double _ds, PlannerHNS::WayPoint& _p
 	return false;
 }
 
+bool OpenDriveRoad::createRoadCenterPoint(RoadCenterInfo& inf_point, double _s)
+{
+	for(unsigned int i=0; i < geometries_.size(); i++)
+	{
+		double end_distance = geometries_.at(i).s + geometries_.at(i).length;
+
+		if(_s >= geometries_.at(i).s && _s <= end_distance)
+		{
+			RoadCenterInfo inf;
+			PlannerHNS::WayPoint p;
+			if(geometries_.at(i).getPoint(_s, p))
+			{
+				Elevation* p_elv = getMatchingElevations(_s);
+				if(p_elv != nullptr)
+				{
+					p.pos.z = p_elv->getHeigh(_s);
+				}
+
+				LaneOffset* p_lane_off = getMatchingLaneOffset(_s);
+				if(p_lane_off != nullptr)
+				{
+					inf.offset_width_ = p_lane_off->getOffset(_s);
+				}
+
+				inf.ds_ = _s;
+				inf.center_p_ = p.pos;
+				inf_point = inf;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void OpenDriveRoad::insertRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, RoadCenterInfo& inf_point)
+{
+	for(unsigned int i = 0; i < points_list.size(); i++)
+	{
+		if(inf_point.ds_ == points_list.at(i).ds_) // exist
+		{
+			return;
+		}
+		else if(inf_point.ds_  < points_list.at(i).ds_)
+		{
+			points_list.insert(points_list.begin()+i, inf_point);
+			return;
+		}
+	}
+
+	points_list.push_back(inf_point);
+}
+
 void OpenDriveRoad::createRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, double resolution)
 {
 	PlannerHNS::WayPoint p;
@@ -204,8 +259,15 @@ void OpenDriveRoad::createRoadCenterInfo(std::vector<RoadCenterInfo>& points_lis
 	points_list.clear();
 	for(unsigned int i=0; i < geometries_.size(); i++)
 	{
-		int n_waypoints = floor(geometries_.at(i).length / resolution);
+		int n_waypoints = floor(geometries_.at(i).length / resolution) + 1;
+
+//		std::cout << "### WayPoints are: " << n_waypoints << ", for Road Geometry : (" << id_ << "," << i << "), With Res: " << resolution << ", and Length: " << geometries_.at(i).length << std::endl;
+
 		double s_inc = geometries_.at(i).s;
+		double remaining_distance = 0.0;
+		double end_distance = geometries_.at(i).s + geometries_.at(i).length;
+		bool bOneMorePoint = false;
+
 		for(int j=0; j< n_waypoints; j++)
 		{
 			if(geometries_.at(i).getPoint(s_inc, p))
@@ -226,13 +288,29 @@ void OpenDriveRoad::createRoadCenterInfo(std::vector<RoadCenterInfo>& points_lis
 				inf.center_p_ = p.pos;
 				points_list.push_back(inf);
 			}
-			s_inc+=resolution;
+
+			remaining_distance = end_distance - s_inc;
+
+			if(remaining_distance < resolution)
+			{
+				s_inc += remaining_distance;
+
+				if(remaining_distance > g_epsilon)
+				{
+					bOneMorePoint = true;
+				}
+				else if(remaining_distance != 0)
+				{
+					std::cout << "$$$ Too Small Geometry !: " << "(" << id_ << "," << i << ", " << j << "), With Res: " << resolution << ", and Length: " << geometries_.at(i).length << ", " << remaining_distance << std::endl;
+				}
+			}
+			else
+				s_inc += resolution;
 		}
 
-		double remaining_distance = geometries_.at(i).s+geometries_.at(i).length - s_inc;
-		if(remaining_distance > 0)
+
+		if(bOneMorePoint == true)
 		{
-			s_inc += remaining_distance;
 			if(geometries_.at(i).getPoint(s_inc, p))
 			{
 				Elevation* p_elv = getMatchingElevations(s_inc);
@@ -251,6 +329,30 @@ void OpenDriveRoad::createRoadCenterInfo(std::vector<RoadCenterInfo>& points_lis
 				inf.center_p_ = p.pos;
 				points_list.push_back(inf);
 			}
+		}
+	}
+
+	for(unsigned int i=0; i< sections_.size(); i++)
+	{
+		double s_inc = sections_.at(i).s_;
+		if(createRoadCenterPoint(inf, s_inc))
+		{
+			insertRoadCenterInfo(points_list, inf);
+		}
+		else
+		{
+			std::cout << ">>>> Can't Find Geometry for Start of Section: " << i << ", Road: " << id_ << std::endl;
+		}
+
+		s_inc = sections_.at(i).s_ + sections_.at(i).length_;
+
+		if(createRoadCenterPoint(inf, s_inc))
+		{
+			insertRoadCenterInfo(points_list, inf);
+		}
+		else
+		{
+			std::cout << ">>>> Can't Find Geometry for Start of Section: " << i << ", Road: " << id_ << std::endl;
 		}
 	}
 }
@@ -433,8 +535,8 @@ void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 			PlannerHNS::Lane op_lane;
 			OpenDriveLane* p_l_l = &p_sec->left_lanes_.at(lj);
 
-			if(p_l_l->type_ == BORDER_LANE)
-				continue;
+//			if(p_l_l->type_ != DRIVING_LANE)
+//				continue;
 
 			op_lane.id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_l_l->id_ * 100;
 			op_lane.num = p_l_l->id_;
@@ -469,8 +571,8 @@ void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 			PlannerHNS::Lane op_lane;
 			OpenDriveLane* p_r_l = &p_sec->right_lanes_.at(rj);
 
-			if(p_r_l->type_ == BORDER_LANE)
-				continue;
+//			if(p_r_l->type_ != DRIVING_LANE)
+//				continue;
 
 			op_lane.id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_r_l->id_ * 100;
 			op_lane.num = p_r_l->id_;
@@ -502,6 +604,113 @@ void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 	}
 }
 
+void OpenDriveRoad::fixRedundantPointsLanes(PlannerHNS::Lane& _lane)
+{
+	for(int ip = 1; ip < _lane.points.size(); ip++)
+	{
+		PlannerHNS::WayPoint* p1 = &_lane.points.at(ip-1);
+		PlannerHNS::WayPoint* p2 = &_lane.points.at(ip);
+		PlannerHNS::WayPoint* p3 = nullptr;
+		if(ip+1 < _lane.points.size())
+			p3 = &_lane.points.at(ip+1);
+
+		double d = hypot(p2->pos.y-p1->pos.y, p2->pos.x-p1->pos.x);
+		if(d < g_epsilon)
+		{
+			p1->toIds = p2->toIds;
+			p1->originalMapID = p2->originalMapID;
+			if(p3 != nullptr)
+				p3->fromIds = p2->fromIds;
+
+			_lane.points.erase(_lane.points.begin()+ip);
+			ip--;
+
+//			std::cout << "Fixed Redundant Points for Lane:" << _lane.id << ", Current: " << ip << ", Size: " << _lane.points.size() << std::endl;
+		}
+	}
+}
+
+void OpenDriveRoad::createSectionPoints(const RoadCenterInfo& ref_info, std::vector<PlannerHNS::Lane>& lanes_list, RoadSection* p_sec, int& wp_id_seq)
+{
+	if(p_sec == nullptr) return;
+
+	double accum_offset_width = ref_info.offset_width_;
+
+	for(unsigned int lj=0; lj < p_sec->left_lanes_.size(); lj++)
+	{
+		OpenDriveLane* p_l_l = &p_sec->left_lanes_.at(lj);
+
+		int combined_lane_id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_l_l->id_ * 100;
+//		if(combined_lane_id == 10253900)
+//		{
+//			std::cout << "found 10253900 on the left: " << std::endl;
+//		}
+
+		PlannerHNS::Lane* p_op_lane = getLaneById(combined_lane_id, lanes_list);
+
+		if(p_op_lane != nullptr)
+		{
+			double lane_width = p_l_l->getLaneWidth(ref_info.ds_ - p_sec->s_);
+			double center_point_margin = accum_offset_width + (lane_width / 2.0);
+
+			PlannerHNS::WayPoint p;
+			p.pos = ref_info.center_p_;
+			double a = p.pos.a+M_PI_2;
+			p.pos.x += center_point_margin * cos(a);
+			p.pos.y += center_point_margin * sin(a);
+			p.collisionCost = lane_width;
+			p.id = wp_id_seq++;
+			//TODO apply super elevation later
+
+			p_op_lane->width = lane_width;
+			p_op_lane->points.push_back(p);
+
+			accum_offset_width += lane_width;
+		}
+		else
+		{
+			std::cout << " >>>>> Can't Find Left Lane:  " << combined_lane_id << std::endl;
+		}
+	}
+
+	accum_offset_width = ref_info.offset_width_;
+
+	for(unsigned int rj=0; rj < p_sec->right_lanes_.size(); rj++)
+	{
+		OpenDriveLane* p_r_l = &p_sec->right_lanes_.at(rj);
+		int combined_lane_id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_r_l->id_ * 100;
+//		if(combined_lane_id == 10253900)
+//		{
+//			std::cout << "found 10253900 on the right: " << this->id_<< ", " << p_sec->length_ <<  std::endl;
+//		}
+		PlannerHNS::Lane* p_op_lane = getLaneById(combined_lane_id, lanes_list);
+
+		if(p_op_lane != nullptr)
+		{
+			double lane_width = p_r_l->getLaneWidth(ref_info.ds_ - p_sec->s_);
+			double center_point_margin = accum_offset_width + (lane_width / 2.0);
+
+			PlannerHNS::WayPoint p;
+			p.pos = ref_info.center_p_;
+			double a = p.pos.a-M_PI_2;
+			p.pos.x += center_point_margin * cos(a);
+			p.pos.y += center_point_margin * sin(a);
+			p.collisionCost = lane_width;
+			p.id = wp_id_seq++;
+			//TODO apply super elevation later
+
+			p_op_lane->width = lane_width;
+			p_op_lane->points.push_back(p);
+
+			accum_offset_width += lane_width;
+		}
+		else
+		{
+			std::cout << " >>>>> Can't Find Right Lane:  " << combined_lane_id << std::endl;
+		}
+	}
+}
+
 void OpenDriveRoad::getRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, double resolution)
 {
 	std::vector<RoadCenterInfo> ref_info;
@@ -511,68 +720,27 @@ void OpenDriveRoad::getRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, doub
 
 	for(unsigned int i=0; i < ref_info.size(); i++)
 	{
-		RoadSection* p_sec = getMatchingSection(ref_info.at(i).ds_);
+		RoadSection* p_sec = getExactMatchingSection(ref_info.at(i).ds_);
 		if(p_sec != nullptr)
 		{
-			double accum_offset_width = ref_info.at(i).offset_width_;
-
-			for(unsigned int lj=0; lj < p_sec->left_lanes_.size(); lj++)
-			{
-				OpenDriveLane* p_l_l = &p_sec->left_lanes_.at(lj);
-
-				int combined_lane_id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_l_l->id_ * 100;
-				PlannerHNS::Lane* p_op_lane = getLaneById(combined_lane_id, lanes_list);
-
-				if(p_op_lane != nullptr)
-				{
-					double lane_width = p_l_l->getLaneWidth(ref_info.at(i).ds_ - p_sec->s_);
-					double center_point_margin = accum_offset_width + (lane_width / 2.0);
-
-					PlannerHNS::WayPoint p;
-					p.pos = ref_info.at(i).center_p_;
-					double a = p.pos.a+M_PI_2;
-					p.pos.x += center_point_margin * cos(a);
-					p.pos.y += center_point_margin * sin(a);
-					p.collisionCost = lane_width;
-					p.id = wp_id_seq++;
-					//TODO apply super elevation later
-
-					p_op_lane->width = lane_width;
-					p_op_lane->points.push_back(p);
-
-					accum_offset_width += lane_width;
-				}
-			}
-
-			accum_offset_width = ref_info.at(i).offset_width_;
-
-			for(unsigned int rj=0; rj < p_sec->right_lanes_.size(); rj++)
-			{
-				OpenDriveLane* p_r_l = &p_sec->right_lanes_.at(rj);
-				int combined_lane_id = (this->id_*100000 + 50000) + p_sec->id_*1000 + p_r_l->id_ * 100;
-				PlannerHNS::Lane* p_op_lane = getLaneById(combined_lane_id, lanes_list);
-
-				if(p_op_lane != nullptr)
-				{
-					double lane_width = p_r_l->getLaneWidth(ref_info.at(i).ds_ - p_sec->s_);
-					double center_point_margin = accum_offset_width + (lane_width / 2.0);
-
-					PlannerHNS::WayPoint p;
-					p.pos = ref_info.at(i).center_p_;
-					double a = p.pos.a-M_PI_2;
-					p.pos.x += center_point_margin * cos(a);
-					p.pos.y += center_point_margin * sin(a);
-					p.collisionCost = lane_width;
-					p.id = wp_id_seq++;
-					//TODO apply super elevation later
-
-					p_op_lane->width = lane_width;
-					p_op_lane->points.push_back(p);
-
-					accum_offset_width += lane_width;
-				}
-			}
+			createSectionPoints(ref_info.at(i), lanes_list, p_sec, wp_id_seq);
+//			std::cout << " >>>>> Found Exact Section:  " << ref_info.at(i).ds_ << std::endl;
 		}
+
+		p_sec = getMatchingSection(ref_info.at(i).ds_);
+		if(p_sec != nullptr)
+		{
+			createSectionPoints(ref_info.at(i), lanes_list, p_sec, wp_id_seq);
+		}
+		else
+		{
+			std::cout << " >>>>> Can't Find Section:  " << ref_info.at(i).ds_ << std::endl;
+		}
+	}
+
+	for(unsigned int i=0; i < lanes_list.size(); i++)
+	{
+		fixRedundantPointsLanes(lanes_list.at(i));
 	}
 }
 

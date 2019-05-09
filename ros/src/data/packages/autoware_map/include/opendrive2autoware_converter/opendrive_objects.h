@@ -547,20 +547,8 @@ public:
 
 		if(str_type.compare("driving")==0)
 			type_ = DRIVING_LANE;
-		else if(str_type.compare("border")==0)
-			type_ = BORDER_LANE;
-//		else if(str_type.compare("driving")==0)
-//		{
-//			type = DRIVING_LANE;
-//		}
-//		else if(str_type.compare("driving")==0)
-//		{
-//			type = DRIVING_LANE;
-//		}
-//		else if(str_type.compare("driving")==0)
-//		{
-//			type = DRIVING_LANE;
-//		}
+		else
+			type_ = NONE_LANE;
 
 		std::vector<TiXmlElement*> elements;
 		XmlHelpers::findFirstElement("link", main_element, elements);
@@ -672,7 +660,9 @@ public:
 			XmlHelpers::findElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
 			for(unsigned int k=0; k < lane_elements.size(); k++)
 			{
-				left_lanes_.push_back(OpenDriveLane(lane_elements.at(k), LEFT_LANE, s_offset, section_length, section_index));
+				OpenDriveLane parsed_lane = OpenDriveLane(lane_elements.at(k), LEFT_LANE, s_offset, section_length, section_index);
+				if(parsed_lane.type_ == DRIVING_LANE)
+					left_lanes_.push_back(parsed_lane );
 			}
 		}
 
@@ -696,7 +686,9 @@ public:
 			XmlHelpers::findElements("lane", sub_elements.at(0)->FirstChildElement(), lane_elements);
 			for(unsigned int k=0; k < lane_elements.size(); k++)
 			{
-				right_lanes_.push_back(OpenDriveLane(lane_elements.at(k), RIGHT_LANE, s_offset, section_length, section_index));
+				OpenDriveLane parsed_lane = OpenDriveLane(lane_elements.at(k), RIGHT_LANE, s_offset, section_length, section_index);
+				if(parsed_lane.type_ == DRIVING_LANE)
+					right_lanes_.push_back(parsed_lane);
 			}
 		}
 

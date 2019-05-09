@@ -33,7 +33,6 @@
 
 #include "opendrive_objects.h"
 
-
 namespace autoware_map
 {
 
@@ -191,15 +190,36 @@ private:
 		if(sections_.size() == 1)
 			return &sections_.at(0);
 
-		for(int i=1; i < sections_.size(); i++)
+		for(unsigned int i=0; i < sections_.size(); i++)
 		{
-			if(sOffset >= sections_.at(i-1).s_ && sOffset < sections_.at(i).s_)
+			double end_offset = sections_.at(i).s_ + sections_.at(i).length_;
+
+			if(sOffset <= end_offset)
 			{
-				return &sections_.at(i-1);
+				return &sections_.at(i);
 			}
 		}
 
-		return &sections_.at(sections_.size()-1);
+		return nullptr;
+	}
+
+	RoadSection* getExactMatchingSection(const double& sOffset)
+	{
+		if(sections_.size() == 0)
+			return nullptr;
+
+		if(sections_.size() == 1)
+			return &sections_.at(0);
+
+		for(unsigned int i=0; i < sections_.size(); i++)
+		{
+			if(sOffset == sections_.at(i).s_)
+			{
+				return &sections_.at(i);
+			}
+		}
+
+		return nullptr;
 	}
 
 	bool createSingleCenterPoint(double _ds, PlannerHNS::WayPoint& _p);
@@ -215,6 +235,11 @@ private:
 
 	void createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list);
 	void createRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, double resolution = 0.5);
+	bool createRoadCenterPoint(RoadCenterInfo& inf_point, double _s);
+	void insertRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, RoadCenterInfo& inf_point);
+	void fixRedundantPointsLanes(PlannerHNS::Lane& _lane);
+	void createSectionPoints(const RoadCenterInfo& ref_info, std::vector<PlannerHNS::Lane>& lanes_list, RoadSection* p_sec, int& wp_id_seq);
+
 
 	PlannerHNS::Lane* getLaneById(const int& _l_id, std::vector<PlannerHNS::Lane>& _lanes_list)
 	{

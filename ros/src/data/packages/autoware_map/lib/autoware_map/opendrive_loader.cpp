@@ -132,35 +132,35 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, const std::str
 	//Connect Roads
 	connectRoads();
 
-	for(unsigned int i=0; i < roads_list_.size(); i++)
-	{
-		std::cout << "Road ID: " << roads_list_.at(i).id_ << std::endl;
-		 std::cout << "From: ";
-		for(unsigned int j=0; j < roads_list_.at(i).from_roads_.size(); j++)
-		{
-			std::cout << "("  << roads_list_.at(i).from_roads_.at(j).incoming_road_ << "|";
-			for(unsigned int k=0; k < roads_list_.at(i).from_roads_.at(j).lane_links.size(); k++)
-			{
-				std::cout << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).second << " ; ";
-			}
-			std::cout << ")";
-		}
-
-		std::cout << std::endl;
-		std::cout << "To : " ;
-
-		for(unsigned int j=0; j < roads_list_.at(i).to_roads_.size(); j++)
-		{
-			std::cout << "("  << roads_list_.at(i).to_roads_.at(j).outgoing_road_ <<"|";
-			for(unsigned int k=0; k < roads_list_.at(i).to_roads_.at(j).lane_links.size(); k++)
-			{
-				std::cout << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).second << " ; ";
-			}
-			std::cout << ")";
-		}
-
-		std::cout << std::endl <<std::endl;
-	}
+//	for(unsigned int i=0; i < roads_list_.size(); i++)
+//	{
+//		std::cout << "Road ID: " << roads_list_.at(i).id_ << std::endl;
+//		std::cout << "From: ";
+//		for(unsigned int j=0; j < roads_list_.at(i).from_roads_.size(); j++)
+//		{
+//			std::cout << "("  << roads_list_.at(i).from_roads_.at(j).incoming_road_ << "|";
+//			for(unsigned int k=0; k < roads_list_.at(i).from_roads_.at(j).lane_links.size(); k++)
+//			{
+//				std::cout << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).second << " ; ";
+//			}
+//			std::cout << ")";
+//		}
+//
+//		std::cout << std::endl;
+//		std::cout << "To : " ;
+//
+//		for(unsigned int j=0; j < roads_list_.at(i).to_roads_.size(); j++)
+//		{
+//			std::cout << "("  << roads_list_.at(i).to_roads_.at(j).outgoing_road_ <<"|";
+//			for(unsigned int k=0; k < roads_list_.at(i).to_roads_.at(j).lane_links.size(); k++)
+//			{
+//				std::cout << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).second << " ; ";
+//			}
+//			std::cout << ")";
+//		}
+//
+//		std::cout << std::endl <<std::endl;
+//	}
 
 	std::cout << "Finish Linking Road Network .. " << std::endl;
 

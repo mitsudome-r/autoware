@@ -17,11 +17,9 @@ int main(int argc, char **argv)
 
 	if(argc < 3)
 	{
-		std::cout << "Too few parameters !" << std::endl;
-		std::cout << " Source OpenDRIVE .xodr file name";
-		std::cout << " Countries' codes folder name";
-		std::cout << " Destination folder for Autoware map files" << std::endl;
-		std::cout << " Waypoints resolution (default is 0.5 meters) " << std::endl;
+		std::cout << "opendrive2autoware_converter is a rosnode that convert OpenDRIVE map format (.xodr) to autoware map format (list of .csv files)." << std::endl << std::endl;
+		std::cout << "Commands: " << std::endl;
+		std::cout << "        opendrive2autoware_converter Source OpenDRIVE .xodr file name,  Countries' codes folder name, Destination folder for Autoware map files, (optional)Waypoints resolution default is 0.5 meters" <<std::endl <<std::endl;
 		return 0;
 	}
 	else
@@ -36,7 +34,7 @@ int main(int argc, char **argv)
 
 		autoware_map::OpenDriveLoader map_loader;
 		PlannerHNS::RoadNetwork map;
-		map_loader.loadOpenDRIVE(src_path, country_codes_path, map);
+		map_loader.loadOpenDRIVE(src_path, country_codes_path, map, wp_res);
 		autoware_map::MapWriter map_save;
 		map_save.writeAutowareMap(dst_path, map);
 		//Write autoware maps files

@@ -10,6 +10,4 @@
 
 namespace autoware_map
 {
-
-
 }

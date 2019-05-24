@@ -132,35 +132,35 @@ void OpenDriveLoader::loadOpenDRIVE(const std::string& xodr_file, const std::str
 	//Connect Roads
 	connectRoads();
 
-//	for(unsigned int i=0; i < roads_list_.size(); i++)
-//	{
-//		std::cout << "Road ID: " << roads_list_.at(i).id_ << std::endl;
-//		std::cout << "From: ";
-//		for(unsigned int j=0; j < roads_list_.at(i).from_roads_.size(); j++)
-//		{
-//			std::cout << "("  << roads_list_.at(i).from_roads_.at(j).incoming_road_ << "|";
-//			for(unsigned int k=0; k < roads_list_.at(i).from_roads_.at(j).lane_links.size(); k++)
-//			{
-//				std::cout << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).second << " ; ";
-//			}
-//			std::cout << ")";
-//		}
-//
-//		std::cout << std::endl;
-//		std::cout << "To : " ;
-//
-//		for(unsigned int j=0; j < roads_list_.at(i).to_roads_.size(); j++)
-//		{
-//			std::cout << "("  << roads_list_.at(i).to_roads_.at(j).outgoing_road_ <<"|";
-//			for(unsigned int k=0; k < roads_list_.at(i).to_roads_.at(j).lane_links.size(); k++)
-//			{
-//				std::cout << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).second << " ; ";
-//			}
-//			std::cout << ")";
-//		}
-//
-//		std::cout << std::endl <<std::endl;
-//	}
+	for(unsigned int i=0; i < roads_list_.size(); i++)
+	{
+		std::cout << "Road ID: " << roads_list_.at(i).id_ << std::endl;
+		std::cout << "From: ";
+		for(unsigned int j=0; j < roads_list_.at(i).from_roads_.size(); j++)
+		{
+			std::cout << "("  << roads_list_.at(i).from_roads_.at(j).incoming_road_ << "|";
+			for(unsigned int k=0; k < roads_list_.at(i).from_roads_.at(j).lane_links.size(); k++)
+			{
+				std::cout << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).from_roads_.at(j).lane_links.at(k).second << " ; ";
+			}
+			std::cout << ")";
+		}
+
+		std::cout << std::endl;
+		std::cout << "To : " ;
+
+		for(unsigned int j=0; j < roads_list_.at(i).to_roads_.size(); j++)
+		{
+			std::cout << "("  << roads_list_.at(i).to_roads_.at(j).outgoing_road_ <<"|";
+			for(unsigned int k=0; k < roads_list_.at(i).to_roads_.at(j).lane_links.size(); k++)
+			{
+				std::cout << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).first << ", " << roads_list_.at(i).to_roads_.at(j).lane_links.at(k).second << " ; ";
+			}
+			std::cout << ")";
+		}
+
+		std::cout << std::endl <<std::endl;
+	}
 
 	std::cout << "Finish Linking Road Network .. " << std::endl;
 
@@ -254,18 +254,17 @@ void OpenDriveLoader::connectRoads()
 				OpenDriveRoad* p_pre_road = getRoadById(roads_list_.at(i).predecessor_road_.at(0).from_road_id_);
 				if(p_pre_road != nullptr)
 				{
-					std::vector<Connection> pre_conn_list = p_pre_road->getLastSectionConnections();
+					std::vector<Connection> pre_conn_list = roads_list_.at(i).getFirstSectionConnections(p_pre_road);
 					for(unsigned k=0; k < pre_conn_list.size(); k++)
 					{
-						pre_conn_list.at(k).outgoing_road_ = roads_list_.at(i).id_;
-						roads_list_.at(i).insertUniqueFromConnection(pre_conn_list.at(k));
-					}
-
-					std::vector<Connection> my_conn_list = roads_list_.at(i).getFirstSectionConnections();
-					for(unsigned k=0; k < my_conn_list.size(); k++)
-					{
-						my_conn_list.at(k).incoming_road_ = p_pre_road->id_;
-						roads_list_.at(i).insertUniqueFromConnection(my_conn_list.at(k));
+						if(pre_conn_list.at(k).outgoing_road_ == roads_list_.at(i).id_)
+						{
+							roads_list_.at(i).insertUniqueFromConnection(pre_conn_list.at(k));							
+						}
+						else if (pre_conn_list.at(k).incoming_road_ == roads_list_.at(i).id_)
+						{
+							roads_list_.at(i).insertUniqueToConnection(pre_conn_list.at(k));
+						}
 					}
 				}
 			}
@@ -279,18 +278,26 @@ void OpenDriveLoader::connectRoads()
 				OpenDriveRoad* p_suc_road = getRoadById(roads_list_.at(i).successor_road_.at(0).to_road_id_);
 				if(p_suc_road != nullptr)
 				{
-					std::vector<Connection> suc_conn_list = p_suc_road->getFirstSectionConnections();
-					for(unsigned k=0; k < suc_conn_list .size(); k++)
+					if(roads_list_.at(i).id_ == 21 )
 					{
-						suc_conn_list.at(k).incoming_road_ = roads_list_.at(i).id_;
-						roads_list_.at(i).insertUniqueToConnection(suc_conn_list .at(k));
+						std::cout << "test" << std::endl;
 					}
-
-					std::vector<Connection> my_conn_list = roads_list_.at(i).getLastSectionConnections();
-					for(unsigned k=0; k < my_conn_list.size(); k++)
+					std::vector<Connection> suc_conn_list = roads_list_.at(i).getLastSectionConnections(p_suc_road);
+					for(unsigned k=0; k < suc_conn_list.size(); k++)
 					{
-						my_conn_list.at(k).outgoing_road_ = p_suc_road->id_;
-						roads_list_.at(i).insertUniqueToConnection(my_conn_list .at(k));
+						if(roads_list_.at(i).id_ == 21 )
+						{
+							std::cout << "test2" << std::endl;
+							std::cout << suc_conn_list.at(k).incoming_road_ << " " << suc_conn_list.at(k).outgoing_road_ << std::endl;
+						}
+						if(suc_conn_list.at(k).outgoing_road_ == roads_list_.at(i).id_)
+						{
+							roads_list_.at(i).insertUniqueFromConnection(suc_conn_list.at(k));							
+						}
+						else if (suc_conn_list.at(k).incoming_road_ == roads_list_.at(i).id_)
+						{
+							roads_list_.at(i).insertUniqueToConnection(suc_conn_list.at(k));
+						}
 					}
 				}
 			}
@@ -298,46 +305,151 @@ void OpenDriveLoader::connectRoads()
 	}
 
 	//Link Junctions
-	for(unsigned int i=0; i < junctions_list_.size(); i++)
-	{
-		for(unsigned int j=0; j < junctions_list_.at(i).connections_.size(); j++)
-		{
-			//std::cout << "J_ID: " << junctions_list_.at(i).id_ << ", (" << junctions_list_.at(i).connections_.at(j).incoming_road_ << ", " << junctions_list_.at(i).connections_.at(j).outgoing_road_ << " )" <<std::endl;
-			OpenDriveRoad* p_from_road = getRoadById(junctions_list_.at(i).connections_.at(j).incoming_road_);
-			if(p_from_road != nullptr)
-			{
-				p_from_road->insertUniqueToConnection(junctions_list_.at(i).connections_.at(j));
-			}
-
-			OpenDriveRoad* p_to_road = getRoadById(junctions_list_.at(i).connections_.at(j).outgoing_road_);
-			if(p_to_road != nullptr)
-			{
-				p_to_road->insertUniqueFromConnection(junctions_list_.at(i).connections_.at(j));
-			}
-		}
-	}
-
-	//Link Missing successors that are linked to junctions
 	for(unsigned int i=0; i < roads_list_.size(); i++)
 	{
 		if(roads_list_.at(i).predecessor_road_.size() > 0)
 		{
-			if(roads_list_.at(i).predecessor_road_.at(0).link_type_ != ROAD_LINK)
+			//connect normal roads , junctions will be handeled alone
+			if(roads_list_.at(i).predecessor_road_.at(0).link_type_ == JUNCTION_LINK)
 			{
-				std::vector<OpenDriveRoad*> pred_list = getRoadsBySuccId(roads_list_.at(i).id_);
-				for(unsigned int j=0; j < pred_list.size(); j++)
+				Junction* p_junction = getJunctionById(roads_list_.at(i).predecessor_road_.at(0).from_road_id_);
+				if(p_junction != nullptr)
 				{
-					for(unsigned int k=0; k < pred_list.at(j)->to_roads_.size(); k++)
+					for( const auto junction_connection : p_junction->getConnectionsByRoadId(roads_list_.at(i).id_))
 					{
-						if(pred_list.at(j)->to_roads_.at(k).outgoing_road_ == roads_list_.at(i).id_)
+						OpenDriveRoad* incoming_road = getRoadById(junction_connection.outgoing_road_);
+						if( incoming_road == nullptr) continue;
+						
+						RoadSection *outgoing_section = roads_list_.at(i).getLastSection();
+						RoadSection *incoming_section = nullptr;
+						if(junction_connection.contact_point_ == "end")
+							incoming_section = incoming_road->getLastSection();
+						else
+							incoming_section = incoming_road->getFirstSection();
+						
+						Connection connection;
+						connection.incoming_road_ = junction_connection.outgoing_road_;
+						connection.outgoing_road_ = roads_list_.at(i).id_;
+						if(incoming_section != nullptr)
+							connection.incoming_section_ = incoming_section->id_;
+						if(outgoing_section != nullptr)
+							connection.outgoing_section_ = roads_list_.at(i).getLastSection()->id_;
+						connection.lane_links = junction_connection.lane_links;
+						
+						if( connection.incoming_road_ == 312 && connection.outgoing_road_ == 22 )
 						{
-							roads_list_.at(i).insertUniqueFromConnection(pred_list.at(j)->to_roads_.at(k));
+							std::cout << "junction!!!!!" << std::endl;
+							std::cout << connection.incoming_road_ << " "
+												<< connection.outgoing_road_ << " " 
+												<< connection.incoming_section_ << " "
+												<< connection.outgoing_section_ << std::endl;
+							std::cout << "links: " << std::endl;
+							for (auto link : connection.lane_links)
+							{
+								std::cout << "link:" <<  link.first << " " << link.second << std::endl;
+							}
+						}
+						
+						//flip if lane is left lane
+						if( !connection.lane_links.empty() && connection.lane_links.at(0).first > 0)
+						{
+							connection.flipRoad();
+							
+							roads_list_.at(i).insertUniqueToConnection(connection);							
+						}
+						else
+						{
+							roads_list_.at(i).insertUniqueFromConnection(connection);							
+						}
+					}
+				}
+			}
+		}
+
+		if(roads_list_.at(i).successor_road_.size() > 0)
+		{
+			//connect normal roads , junctions will be handeled alone
+			if(roads_list_.at(i).successor_road_.at(0).link_type_ == JUNCTION_LINK)
+			{
+				Junction* p_junction = getJunctionById(roads_list_.at(i).successor_road_.at(0).to_road_id_);
+				if(p_junction != nullptr)
+				{
+					for( const auto junction_connection : p_junction->getConnectionsByRoadId(roads_list_.at(i).id_))
+					{
+						OpenDriveRoad* outgoing_road = getRoadById(junction_connection.outgoing_road_);
+						if( outgoing_road == nullptr) continue;
+		
+						RoadSection *incoming_section = roads_list_.at(i).getLastSection();
+						RoadSection *outgoing_section = nullptr;
+						if(junction_connection.contact_point_ == "end")
+							outgoing_section = outgoing_road->getLastSection();
+						else
+							outgoing_section = outgoing_road->getFirstSection();
+						if(incoming_section == nullptr || outgoing_section == nullptr) continue;
+		
+						Connection connection;
+						connection.incoming_road_ = roads_list_.at(i).id_;
+						connection.outgoing_road_ = junction_connection.outgoing_road_;
+						connection.incoming_section_ = incoming_section->id_;
+						connection.outgoing_section_ = outgoing_section->id_;
+						connection.lane_links = junction_connection.lane_links;
+		
+						//flip if lane is left lane
+						if( !connection.lane_links.empty() && connection.lane_links.at(0).first > 0)
+						{
+							connection.flip();
+							roads_list_.at(i).insertUniqueFromConnection(connection);							
+						}
+						else
+						{
+							roads_list_.at(i).insertUniqueToConnection(connection);							
 						}
 					}
 				}
 			}
 		}
 	}
+
+	// for(unsigned int i=0; i < junctions_list_.size(); i++)
+	// {
+	// 	for(unsigned int j=0; j < junctions_list_.at(i).connections_.size(); j++)
+	// 	{
+	// 		//std::cout << "J_ID: " << junctions_list_.at(i).id_ << ", (" << junctions_list_.at(i).connections_.at(j).incoming_road_ << ", " << junctions_list_.at(i).connections_.at(j).outgoing_road_ << " )" <<std::endl;
+	// 		OpenDriveRoad* p_from_road = getRoadById(junctions_list_.at(i).connections_.at(j).incoming_road_);
+	// 		if(p_from_road != nullptr)
+	// 		{
+	// 			p_from_road->insertUniqueToConnection(junctions_list_.at(i).connections_.at(j));
+	// 		}
+	// 
+	// 		OpenDriveRoad* p_to_road = getRoadById(junctions_list_.at(i).connections_.at(j).outgoing_road_);
+	// 		if(p_to_road != nullptr)
+	// 		{
+	// 			p_to_road->insertUniqueFromConnection(junctions_list_.at(i).connections_.at(j));
+	// 		}
+	// 	}
+	// }
+	// 
+	// //Link Missing successors that are linked to junctions
+	// for(unsigned int i=0; i < roads_list_.size(); i++)
+	// {
+	// 	if(roads_list_.at(i).predecessor_road_.size() > 0)
+	// 	{
+	// 		if(roads_list_.at(i).predecessor_road_.at(0).link_type_ != ROAD_LINK)
+	// 		{
+	// 			std::vector<OpenDriveRoad*> pred_list = getRoadsBySuccId(roads_list_.at(i).id_);
+	// 			for(unsigned int j=0; j < pred_list.size(); j++)
+	// 			{
+	// 				for(unsigned int k=0; k < pred_list.at(j)->to_roads_.size(); k++)
+	// 				{
+	// 					if(pred_list.at(j)->to_roads_.at(k).outgoing_road_ == roads_list_.at(i).id_)
+	// 					{
+	// 						roads_list_.at(i).insertUniqueFromConnection(pred_list.at(j)->to_roads_.at(k));
+	// 					}
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// }
 }
 
 void OpenDriveLoader::getMapLanes(std::vector<PlannerHNS::Lane>& all_lanes, double resolution)

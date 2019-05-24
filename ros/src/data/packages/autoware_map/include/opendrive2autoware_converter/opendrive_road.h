@@ -109,9 +109,8 @@ public:
 	std::vector<Connection> from_roads_;
 	std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* p_country_signal_codes_;
 
-
-	std::vector<Connection> getFirstSectionConnections();
-	std::vector<Connection> getLastSectionConnections();
+	std::vector<Connection> getFirstSectionConnections( OpenDriveRoad *_p_predecessor_road);
+	std::vector<Connection> getLastSectionConnections( OpenDriveRoad *_p_predecessor_road);
 	void getRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, double resolution = 0.5);
 	void getTrafficLights(std::vector<PlannerHNS::TrafficLight>& all_lights);
 	void getTrafficSigns(std::vector<PlannerHNS::TrafficSign>& all_signs);
@@ -129,6 +128,22 @@ public:
 	}
 
 	OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes = nullptr);
+
+	RoadSection* getFirstSection()
+	{
+		if(sections_.size() == 0)
+			return nullptr;
+
+		return &sections_.at(0);
+	}
+
+	RoadSection* getLastSection()
+	{
+		if(sections_.size() == 0)
+			return nullptr;
+
+		return &sections_.at(sections_.size()-1);
+	}
 
 private:
 	Geometry* getMatchingGeometry(const double& sOffset)
@@ -238,7 +253,7 @@ private:
 	bool createRoadCenterPoint(RoadCenterInfo& inf_point, double _s);
 	void insertRoadCenterInfo(std::vector<RoadCenterInfo>& points_list, RoadCenterInfo& inf_point);
 	void fixRedundantPointsLanes(PlannerHNS::Lane& _lane);
-	void createSectionPoints(const RoadCenterInfo& ref_info, std::vector<PlannerHNS::Lane>& lanes_list, RoadSection* p_sec, int& wp_id_seq);
+	void createSectionPoints(const RoadCenterInfo& ref_info, std::vector<PlannerHNS::Lane>& lanes_list, RoadSection* p_sec, int& wp_id_seq, std::vector<int> &left_lane_ids, std::vector<int> &right_lane_ids);
 
 
 	PlannerHNS::Lane* getLaneById(const int& _l_id, std::vector<PlannerHNS::Lane>& _lanes_list)
@@ -250,22 +265,6 @@ private:
 		}
 
 		return nullptr;
-	}
-
-	RoadSection* getFirstSection()
-	{
-		if(sections_.size() == 0)
-			return nullptr;
-
-		return &sections_.at(0);
-	}
-
-	RoadSection* getLastSection()
-	{
-		if(sections_.size() == 0)
-			return nullptr;
-
-		return &sections_.at(sections_.size()-1);
 	}
 
 	bool exists(const std::vector<int>& _list, int _val)

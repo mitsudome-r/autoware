@@ -18,10 +18,16 @@
 template <class T>
 std::vector<T> parse(const std::string& csv_file)
 {
+    std::vector<T> objs;    
     std::ifstream ifs(csv_file.c_str());
+    if( !ifs.good() )
+    {
+        ROS_WARN_STREAM("could not find file: " << csv_file);
+        return objs;        
+    }
+
     std::string line;
     std::getline(ifs, line); // remove first line
-    std::vector<T> objs;
     while (std::getline(ifs, line))
     {
         T obj;
@@ -32,7 +38,7 @@ std::vector<T> parse(const std::string& csv_file)
     return objs;
 }
 
-void readFiles( const std::vector<std::string> file_paths,
+void readFiles( const std::string directory_path,
                 std::vector<autoware_map_msgs::Area> &areas,
                 std::vector<autoware_map_msgs::Lane> &lanes,
                 std::vector<autoware_map_msgs::LaneAttributeRelation> &lane_attribute_relations,
@@ -50,90 +56,52 @@ void readFiles( const std::vector<std::string> file_paths,
                 std::vector<autoware_map_msgs::WaypointSignalRelation> &waypoint_signal_relations
                 )
 {
-    for (const auto& file_path : file_paths)
-    {
+    std::string file_path;
 
-        std::string file_name(basename(file_path.c_str()));
-        if (file_name == "points.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-      points = parse<autoware_map_msgs::Point>(file_path);
-        }
-        else if(file_name == "lanes.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            lanes = parse<autoware_map_msgs::Lane>(file_path);
-        }
-        else if(file_name == "lane_attribute_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            lane_attribute_relations = parse<autoware_map_msgs::LaneAttributeRelation>(file_path);
-        }
-        else if(file_name == "lane_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            lane_relations = parse<autoware_map_msgs::LaneRelation>(file_path);
-        }
-        else if(file_name == "lane_signal_light_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            lane_signal_relations = parse<autoware_map_msgs::LaneSignalLightRelation>(file_path);
-        }
-        else if(file_name == "lane_change_relations.csv" )
-        {
-          std::cerr << __LINE__ << std::endl;
-            lane_change_relations = parse<autoware_map_msgs::LaneChangeRelation>(file_path);
-        }
-        else if(file_name == "opposite_lane_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            opposite_lane_relations = parse<autoware_map_msgs::OppositeLaneRelation>(file_path);
-        }
-        else if(file_name == "areas.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            areas = parse<autoware_map_msgs::Area>(file_path);
-        }
-        else if(file_name == "signals.csv")
-        {
-            std::cerr << __LINE__ << std::endl;
-            signals = parse<autoware_map_msgs::Signal>(file_path);
-        }
-        else if(file_name == "signal_lights.csv")
-        {
-            signal_lights = parse<autoware_map_msgs::SignalLight>(file_path);
-            std::cerr << __LINE__ << std::endl;
-        }
-        else if(file_name == "wayareas.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            wayareas = parse<autoware_map_msgs::Wayarea>(file_path);
-        }
-        else if(file_name == "waypoints.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            waypoints= parse<autoware_map_msgs::Waypoint>(file_path);
-        }
-        else if(file_name == "waypoint_lane_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            waypoint_lane_relations= parse<autoware_map_msgs::WaypointLaneRelation>(file_path);
-        }
-        else if(file_name == "waypoint_relations.csv")
-        {
-          std::cerr << __LINE__ << std::endl;
-            waypoint_relations = parse<autoware_map_msgs::WaypointRelation>(file_path);
-        }
-        else if(file_name == "waypoint_signal_relations.csv")
-        {
-            waypoint_signal_relations = parse<autoware_map_msgs::WaypointSignalRelation>(file_path);
-            std::cerr << __LINE__ << std::endl;
-        }
-        else
-        {
-            ROS_ERROR_STREAM("unknown csv file: " << file_path);
-        }
-    }
+    file_path = directory_path + "/points.csv";
+    points = parse<autoware_map_msgs::Point>(file_path);
+    
+    file_path = directory_path + "/lanes.csv";
+    lanes = parse<autoware_map_msgs::Lane>(file_path);
+    
+    file_path = directory_path + "/lane_attribute_relations.csv";
+    lane_attribute_relations = parse<autoware_map_msgs::LaneAttributeRelation>(file_path);
+    
+    file_path = directory_path + "/lane_relations.csv";
+    lane_relations = parse<autoware_map_msgs::LaneRelation>(file_path);
+    
+    file_path = directory_path + "/lane_signal_light_relations.csv";
+    lane_signal_relations = parse<autoware_map_msgs::LaneSignalLightRelation>(file_path);
+    
+    file_path = directory_path + "/lane_change_relations.csv";
+    lane_change_relations = parse<autoware_map_msgs::LaneChangeRelation>(file_path);
+    
+    file_path = directory_path + "/opposite_lane_relations.csv";
+    opposite_lane_relations = parse<autoware_map_msgs::OppositeLaneRelation>(file_path);
+    
+    file_path = directory_path + "/areas.csv";
+    areas = parse<autoware_map_msgs::Area>(file_path);
+    
+    file_path = directory_path + "/signals.csv";
+    signals = parse<autoware_map_msgs::Signal>(file_path);
+    
+    file_path = directory_path + "/signal_lights.csv";
+    signal_lights = parse<autoware_map_msgs::SignalLight>(file_path);
+    
+    file_path = directory_path + "/wayareas.csv";
+    wayareas = parse<autoware_map_msgs::Wayarea>(file_path);
+    
+    file_path = directory_path + "/waypoints.csv";
+    waypoints = parse<autoware_map_msgs::Waypoint>(file_path);
+    
+    file_path = directory_path + "/waypoint_lane_relations.csv";
+    waypoint_lane_relations = parse<autoware_map_msgs::WaypointLaneRelation>(file_path);
+    
+    file_path = directory_path + "/waypoint_relations.csv";
+    waypoint_relations = parse<autoware_map_msgs::WaypointRelation>(file_path);
+    
+    file_path = directory_path + "/waypoint_signal_relations.csv";
+    waypoint_signal_relations = parse<autoware_map_msgs::WaypointSignalRelation>(file_path);
 }
 
 
@@ -152,6 +120,10 @@ int main(int argc, char **argv)
         std::string file_path(argv[i]);
         file_paths.push_back(file_path);
     }
+    
+    std::string map_dir;
+    pnh.param<std::string>("map_dir", map_dir, "./");
+    
     std::string save_dir;
     pnh.param<std::string>("save_dir", save_dir, "./");
 
@@ -194,7 +166,7 @@ int main(int argc, char **argv)
     std::vector<vector_map_msgs::WayArea> vmap_way_areas;
     std::vector<vector_map_msgs::WhiteLine> vmap_white_lines;
 
-    readFiles(file_paths,
+    readFiles(map_dir,
               areas,
               lanes,
               lane_attribute_relations,

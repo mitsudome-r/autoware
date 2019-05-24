@@ -1,0 +1,4 @@
+Defined_autoware_type,Define_autoware_sub_type,Standard_id,Standard_sub_id,comments
+TRAFFIC_LIGHT,VERTICAL_DEFAULT_LIGHT,1000001,-1,Default vertical traffic light 
+ROAD_MARK,STOP_LINE_MARK,294,-1,Stop line
+ROAD_MARK,WAITING_LINE_MARK,341,-1,waiting line 

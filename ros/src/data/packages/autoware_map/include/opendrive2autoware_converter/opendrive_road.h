@@ -93,6 +93,7 @@ public:
 	int id_;
 	int junction_id_;
 	double length_;
+	bool keep_right_;
 	std::vector<FromRoadLink> predecessor_road_;
 	std::vector<ToRoadLink> successor_road_;
 	std::vector<Geometry> geometries_;
@@ -124,10 +125,11 @@ public:
 		id_ = 0;
 		junction_id_ = 0;
 		length_ = 0;
+		keep_right_ = true;
 
 	}
 
-	OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes = nullptr);
+	OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes = nullptr, bool keep_right = true);
 
 	RoadSection* getFirstSection()
 	{

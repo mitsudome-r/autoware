@@ -7,19 +7,20 @@
 
 #include "opendrive2autoware_converter/opendrive_road.h"
 #include <fstream>
-
+#include <functional>
 namespace autoware_map
 {
 
 double g_epsilon = 0.0000001;
 
-OpenDriveRoad::OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes)
+OpenDriveRoad::OpenDriveRoad(TiXmlElement* main_element, std::vector<std::pair<std::string, std::vector<CSV_Reader::LINE_DATA> > >* country_signal_codes, bool keep_right)
 {
 	name_ = XmlHelpers::getStringAttribute(main_element, "name", "");
 	id_ = XmlHelpers::getIntAttribute(main_element, "id", 0);
 	junction_id_ = XmlHelpers::getIntAttribute(main_element, "junction", -1);
 	length_ = XmlHelpers::getDoubleAttribute(main_element, "length", 0.0);
 	p_country_signal_codes_ = country_signal_codes;
+	keep_right_ = keep_right;
 
 	//Read Links
 	std::vector<TiXmlElement*> sub_elements;
@@ -520,6 +521,28 @@ void OpenDriveRoad::insertUniqueFromConnection(const Connection& _connection)
 
 void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 {
+	using namespace std::placeholders;
+	std::function<void(int, int, PlannerHNS::Lane&)> insertToRoad;
+	std::function<void(int, int, PlannerHNS::Lane&)> insertFromRoad;
+	std::function<void(int, const OpenDriveLane*, PlannerHNS::Lane&)> insertToSection;
+	std::function<void(int, const OpenDriveLane*, PlannerHNS::Lane&)> insertFromSection;
+
+	//flip to and from depending on keep right or keep left rule
+	if(keep_right_)
+	{
+		insertToRoad = std::bind(&OpenDriveRoad::insertUniqueToRoadIds, this, _1, _2, _3);
+		insertFromRoad = std::bind(&OpenDriveRoad::insertUniqueFromRoadIds, this, _1, _2, _3);
+		insertToSection = std::bind(&OpenDriveRoad::insertUniqueToSectionIds, this, _1, _2, _3);
+		insertFromSection = std::bind(&OpenDriveRoad::insertUniqueFromSectionIds, this, _1, _2, _3);
+	}
+	else
+	{
+		insertToRoad = std::bind(&OpenDriveRoad::insertUniqueFromRoadIds, this, _1, _2, _3);
+		insertFromRoad = std::bind(&OpenDriveRoad::insertUniqueToRoadIds, this, _1, _2, _3);
+		insertToSection = std::bind(&OpenDriveRoad::insertUniqueFromSectionIds, this, _1, _2, _3);
+		insertFromSection = std::bind(&OpenDriveRoad::insertUniqueToSectionIds, this, _1, _2, _3);		
+	}
+	
 	for(unsigned int i=0; i < sections_.size(); i++)
 	{
 		RoadSection* p_sec = & sections_.at(i);
@@ -536,15 +559,16 @@ void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 			op_lane.num = p_l_l->id_;
 			op_lane.roadId = id_;
 
+
 			if(i == 0){
-				insertUniqueToRoadIds(p_sec->id_, p_l_l->id_, op_lane);
+				insertToRoad(p_sec->id_, p_l_l->id_, op_lane);
 			}else{
-				insertUniqueToSectionIds(p_sec->id_-1, p_l_l, op_lane);
+				insertToSection(p_sec->id_-1, p_l_l, op_lane);
 			}
 			if( i == sections_.size()-1){
-				insertUniqueFromRoadIds(p_sec->id_, p_l_l->id_, op_lane);
+				insertFromRoad(p_sec->id_, p_l_l->id_, op_lane);
 			}else{
-				insertUniqueFromSectionIds(p_sec->id_+1, p_l_l, op_lane);
+				insertFromSection(p_sec->id_+1, p_l_l, op_lane);
 			}
 			lanes_list.push_back(op_lane);
 		}
@@ -559,14 +583,14 @@ void OpenDriveRoad::createRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list)
 			op_lane.roadId = id_;
 
 			if(i == 0){
-				insertUniqueFromRoadIds(p_sec->id_, p_r_l->id_, op_lane);
+				insertFromRoad(p_sec->id_, p_r_l->id_, op_lane);
 			}else{
-				insertUniqueFromSectionIds(p_sec->id_-1, p_r_l, op_lane);
+				insertFromSection(p_sec->id_-1, p_r_l, op_lane);
 			}
 			if( i == sections_.size()-1){					
-				insertUniqueToRoadIds(p_sec->id_, p_r_l->id_, op_lane);
+				insertToRoad(p_sec->id_, p_r_l->id_, op_lane);
 			}else{
-				insertUniqueToSectionIds(p_sec->id_+1, p_r_l, op_lane);
+				insertToSection(p_sec->id_+1, p_r_l, op_lane);
 			}
 			
 			lanes_list.push_back(op_lane);
@@ -711,8 +735,7 @@ void OpenDriveRoad::getRoadLanes(std::vector<PlannerHNS::Lane>& lanes_list, doub
 		}
 	}
 	
-	bool keep_right = true;
-	if(keep_right)
+	if(keep_right_)
 	{
 			for( auto id: left_lane_ids )
 			{
@@ -765,10 +788,6 @@ std::vector<Connection> OpenDriveRoad::getLastSectionConnections(OpenDriveRoad *
 				if(p_l_sec->right_lanes_.at(i).to_lane_.size() > 0)
 				{
 					int _to_id = p_l_sec->right_lanes_.at(i).to_lane_.at(0).to_lane_id;
-					if(conn.outgoing_road_ == 21)
-					{
-						std::cout << conn.incoming_road_ << " " << conn.outgoing_road_ << p_l_sec->right_lanes_.at(i).id_ << " " <<  _to_id << std::endl;
-					}
 					conn.lane_links.push_back(std::make_pair(p_l_sec->right_lanes_.at(i).id_, _to_id));
 				}
 				
@@ -779,7 +798,6 @@ std::vector<Connection> OpenDriveRoad::getLastSectionConnections(OpenDriveRoad *
 				}
 			}
 		}
-		
 		
 		//for left lanes
 		if(p_l_sec != nullptr )

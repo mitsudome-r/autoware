@@ -17,13 +17,24 @@
 #include <unordered_map>
 #include <boost/functional/hash.hpp>
 #include <vector_map/vector_map.h>
+#include <amathutils_lib/amathutils.hpp>
 template <class T>
 void write(std::ofstream &ofs, std::vector<T> objs)
 {
   for( auto obj : objs)
   {
-    ofs << obj << std::endl;
+    ofs << std::fixed << obj << std::endl;
   }
+}
+
+bool open_file(const std::string file_path, std::ofstream &ofs)
+{
+  ofs.open(file_path);
+  if(!ofs.good())
+  {
+    ROS_ERROR_STREAM("Failed to open " << file_path);
+  }
+  return ofs.good();
 }
 
 using uint_pair = std::pair<unsigned int, unsigned int>;
@@ -54,9 +65,11 @@ void writeVectorMapMsgs(const std::string output_dir,
   if(!vmap_areas.empty())
   {
     filename = output_dir + "/area.csv";
-    ofs.open(filename);
-    ofs << "AID,SLID,ELID" << std::endl;
-    write(ofs, vmap_areas);
+    if( open_file(filename, ofs))
+    {
+      ofs << "AID,SLID,ELID" << std::endl;
+      write(ofs, vmap_areas);
+    }
     ofs.close();
   }
 
@@ -64,137 +77,166 @@ void writeVectorMapMsgs(const std::string output_dir,
   if(!vmap_cross_roads.empty())
   {
     filename = output_dir + "/intersection.csv";
-    ofs.open(filename);
-    ofs << "ID,AID,LinkID" << std::endl;
-    write(ofs, vmap_cross_roads);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,AID,LinkID" << std::endl;
+      write(ofs, vmap_cross_roads);
+    }
     ofs.close();
   }
   //cross_walk
   if(!vmap_cross_walks.empty())
   {
     filename = output_dir + "/crosswalk.csv";
-    ofs.open(filename);
-    ofs << "ID,AID,Type,BdID,LinkID" << std::endl;
-    write(ofs, vmap_cross_walks);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,AID,Type,BdID,LinkID" << std::endl;
+      write(ofs, vmap_cross_walks);
+    }
     ofs.close();
   }
 
   //DTLane
   if(!vmap_dtlanes.empty())
   {
-
     filename = output_dir + "/dtlane.csv";
-    ofs.open(filename);
-    ofs << "DID,Dist,PID,Dir,Apara,r,slope,cant,LW,RW" << std::endl;
-    write(ofs, vmap_dtlanes);
+    if( open_file(filename, ofs))
+    {
+      ofs << "DID,Dist,PID,Dir,Apara,r,slope,cant,LW,RW" << std::endl;
+      write(ofs, vmap_dtlanes);
+    }
     ofs.close();
   }
   //Lanes
   if(!vmap_lanes.empty())
   {
     filename = output_dir + "/lane.csv";
-    ofs.open(filename);
-    ofs << "LnID,DID,BLID,FLID,BNID,FNID,JCT,BLID2,BLID3,BLID4,FLID2,FLID3,FLID4,ClossID,Span,LCnt,Lno,LaneType,LimitVel,RefVel,RoadSecID,LaneChgFG,LinkWAID" << std::endl;
-    write(ofs, vmap_lanes);
+    if( open_file(filename, ofs))
+    {
+      ofs << "LnID,DID,BLID,FLID,BNID,FNID,JCT,BLID2,BLID3,BLID4,FLID2,FLID3,FLID4,ClossID,Span,LCnt,Lno,LaneType,LimitVel,RefVel,RoadSecID,LaneChgFG,LinkWAID" << std::endl;
+      write(ofs, vmap_lanes);
+    }
     ofs.close();
   }
   //Lanes
   if(!vmap_lines.empty())
   {
     filename = output_dir + "/line.csv";
-    ofs.open(filename);
-    ofs << "LID,BPID,FPID,BLID,FLID" << std::endl;
-    write(ofs, vmap_lines);
+    if( open_file(filename, ofs))
+    {
+      ofs << "LID,BPID,FPID,BLID,FLID" << std::endl;
+      write(ofs, vmap_lines);
+    }
     ofs.close();
   }
   //nodes
   if(!vmap_nodes.empty())
   {
     filename = output_dir + "/node.csv";
-    ofs.open(filename);
-    ofs << "NID,PID" << std::endl;
-    write(ofs, vmap_nodes);
+    if( open_file(filename, ofs))
+    {
+      ofs << "NID,PID" << std::endl;
+      write(ofs, vmap_nodes);
+    }
     ofs.close();
   }
   //points
   if(!vmap_points.empty())
   {
     filename = output_dir + "/point.csv";
-    ofs.open(filename);
-    ofs << "PID,B,L,H,Bx,Ly,ReF,MCODE1,MCODE2,MCODE3" << std::endl;
-    write(ofs, vmap_points);
+    if( open_file(filename, ofs))
+    {
+      ofs << "PID,B,L,H,Bx,Ly,ReF,MCODE1,MCODE2,MCODE3" << std::endl;
+      write(ofs, vmap_points);
+    }
     ofs.close();
   }
   //poles
   if(!vmap_poles.empty())
   {
     filename = output_dir + "/pole.csv";
-    ofs.open(filename);
-    ofs << "PLID,VID,Length,Dim" << std::endl;
-    write(ofs, vmap_poles);
+    if( open_file(filename, ofs))
+    {
+      ofs << "PLID,VID,Length,Dim" << std::endl;
+      write(ofs, vmap_poles);
+    }
     ofs.close();
   }
   //utility poles
   if(!vmap_utility_poles.empty())
   {
     filename = output_dir + "/poledata.csv";
-    ofs.open(filename);
-    ofs << "ID,PLID,LinkID" << std::endl;
-    write(ofs, vmap_utility_poles);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,PLID,LinkID" << std::endl;
+      write(ofs, vmap_utility_poles);
+    }
     ofs.close();
   }
   //road_signs
   if(!vmap_road_signs.empty())
   {
     filename = output_dir + "/roadsign.csv";
-    ofs.open(filename);
-    ofs << "ID,VID,PLID,Type,LinkID" << std::endl;
-    write(ofs, vmap_road_signs);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,VID,PLID,Type,LinkID" << std::endl;
+      write(ofs, vmap_road_signs);
+    }
     ofs.close();
   }
   //signals
   if(!vmap_signals.empty())
   {
     filename = output_dir + "/signaldata.csv";
-    ofs.open(filename);
-    ofs << "ID,VID,PLID,Type,LinkID" << std::endl;
-    write(ofs, vmap_signals);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,VID,PLID,Type,LinkID" << std::endl;
+      write(ofs, vmap_signals);
+    }
     ofs.close();
   }
   //stop_line
   if(!vmap_stop_lines.empty())
   {
     filename = output_dir + "/stopline.csv";
-    ofs.open(filename);
-    ofs << "ID,LID,TLID,SignID,LinkID" << std::endl;
-    write(ofs, vmap_stop_lines);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,LID,TLID,SignID,LinkID" << std::endl;
+      write(ofs, vmap_stop_lines);
+    }
     ofs.close();
   }
   //vectors
   if(!vmap_vectors.empty())
   {
     filename = output_dir + "/vector.csv";
-    ofs.open(filename);
-    ofs << "VID,PID,Hang,Vang" << std::endl;
-    write(ofs, vmap_vectors);
+    if( open_file(filename, ofs))
+    {
+      ofs << "VID,PID,Hang,Vang" << std::endl;
+      write(ofs, vmap_vectors);
+    }
     ofs.close();
   }
   //wayareas
   if(!vmap_way_areas.empty())
   {
     filename = output_dir + "/wayarea.csv";
-    ofs.open(filename);
-    ofs << "ID,AID" << std::endl;
-    write(ofs, vmap_way_areas);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,AID" << std::endl;
+      write(ofs, vmap_way_areas);
+    }
     ofs.close();
   }
 
   if(!vmap_white_lines.empty())
   {
     filename = output_dir + "/whiteline.csv";
-    ofs.open(filename);
-    ofs << "ID,LID,Width,Color,type,LinkID" << std::endl;
-    write(ofs, vmap_white_lines);
+    if( open_file(filename, ofs))
+    {
+      ofs << "ID,LID,Width,Color,type,LinkID" << std::endl;
+      write(ofs, vmap_white_lines);
+    }
     ofs.close();
   }
 }
@@ -323,30 +365,34 @@ void createNodes(const autoware_map::AutowareMapHandler &awmap, std::vector<vect
   {
     vector_map_msgs::Node vmap_node;
     vmap_node.nid = awmap_wp.waypoint_id;
-    vmap_node.pid = awmap_wp.waypoint_id;
+    vmap_node.pid = awmap_wp.point_id;
     vmap_nodes.push_back(vmap_node);
+    if (vmap_node.nid == 157)
+    {
+      std::cout << __LINE__ << std::endl;
+    }
   }
 }
 
-std::vector<int> findBranchingIdx(const std::vector<autoware_map::WaypointRelation> &relation, int root_index, const std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair>> &lookup_table)
+std::vector<int> findBranchingIdx(const std::vector<autoware_map::WaypointRelation> &relation, int root_index, const std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair> > &lookup_table)
 {
   std::vector<int> branching_indices;
   for(const auto &r : relation)
   {
-    if(r.waypoint_id == root_index){
+    if(r.waypoint_id == root_index) {
       auto key = std::make_pair(r.waypoint_id, r.next_waypoint_id);
       branching_indices.push_back(lookup_table.at(key));
     }
   }
   return branching_indices;
 }
-std::vector<int> findMergingIdx(const std::vector<autoware_map::WaypointRelation> &relation, int merged_index,const std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair>> &lookup_table)
+std::vector<int> findMergingIdx(const std::vector<autoware_map::WaypointRelation> &relation, int merged_index,const std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair> > &lookup_table)
 {
   std::vector<int> merging_indices;
 
   for(const auto &r : relation)
   {
-    if(r.waypoint_id == merged_index)
+    if(r.next_waypoint_id == merged_index)
     {
       auto key = std::make_pair(r.waypoint_id, r.next_waypoint_id);
       merging_indices.push_back(lookup_table.at(key));
@@ -446,12 +492,13 @@ void createDTLanes(const autoware_map::AutowareMapHandler &awmap,
   //create lookup table:
   // key = waypoint_relation
   // value = lnid;
-  std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair>> wp_relation2lnid;
+  std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair> > wp_relation2lnid;
   unsigned int id = 1;
-  for ( auto r : awmap_waypoint_relations ){
-     auto key = std::make_pair(r.waypoint_id,r.next_waypoint_id);
-     wp_relation2lnid[key] = id;
-     id++;
+  for ( auto r : awmap_waypoint_relations )
+  {
+    auto key = std::make_pair(r.waypoint_id,r.next_waypoint_id);
+    wp_relation2lnid[key] = id;
+    id++;
   }
 
   id = 1;
@@ -498,30 +545,31 @@ void createDTLanes(const autoware_map::AutowareMapHandler &awmap,
     vmap_lane.flid3 = 0;
     vmap_lane.flid4 = 0;
     if(merging_idx.size() >= 1)
-      vmap_lane.blid = merging_idx.at(0) + 1;
+      vmap_lane.blid = merging_idx.at(0);
     if(merging_idx.size() >= 2)
-      vmap_lane.blid2 = merging_idx.at(1) + 1;
+      vmap_lane.blid2 = merging_idx.at(1);
     if(merging_idx.size() >= 3)
-      vmap_lane.blid3 = merging_idx.at(2) + 1;
+      vmap_lane.blid3 = merging_idx.at(2);
     if(merging_idx.size() >= 4)
-      vmap_lane.blid4 = merging_idx.at(3) + 1;
+      vmap_lane.blid4 = merging_idx.at(3);
     if(branching_idx.size() >= 1)
-      vmap_lane.flid = branching_idx.at(0) + 1;
+      vmap_lane.flid = branching_idx.at(0);
     if(branching_idx.size() >= 2)
-      vmap_lane.flid2 = branching_idx.at(1) + 1;
+      vmap_lane.flid2 = branching_idx.at(1);
     if(branching_idx.size() >= 3)
-      vmap_lane.flid3 = branching_idx.at(2) + 1;
+      vmap_lane.flid3 = branching_idx.at(2);
     if(branching_idx.size() >= 4)
-      vmap_lane.flid4 = branching_idx.at(3) + 1;
-    vmap_lane.bnid = awmap_waypoint.point_id;
-    vmap_lane.fnid = awmap_next_waypoint.point_id;
+      vmap_lane.flid4 = branching_idx.at(3);
+    vmap_lane.bnid = awmap_waypoint.waypoint_id;
+    vmap_lane.fnid = awmap_next_waypoint.waypoint_id;
     vmap_lane.span =  awmap_waypoint_relation.distance;
     vmap_lane.lanetype = awmap_waypoint_relation.blinker;
     vmap_lane.refvel = awmap_waypoint.velocity;
 
     //find lane that both current and next waypoint belongs to
     autoware_map_msgs::Lane awmap_lane;
-    for( auto candidate : awmap_waypoint.getBelongingLanes()){
+    for( auto candidate : awmap_waypoint.getBelongingLanes())
+    {
       if( awmap_next_waypoint.belongLane(candidate->lane_id))
       {
         awmap_lane = *candidate;
@@ -536,6 +584,9 @@ void createDTLanes(const autoware_map::AutowareMapHandler &awmap,
 
     vmap_lane.roadsecid = 0;
     vmap_lane.linkwaid = 0;
+    if(vmap_lane.lnid == 158){
+      std::cerr << __LINE__ << std::endl;
+    }
     vmap_lanes.push_back(vmap_lane);
     id++;
   }
@@ -853,7 +904,7 @@ void createStopLines( const autoware_map::AutowareMapHandler &awmap,
     vector_map_msgs::Point start_point, end_point;
     start_point.pid = point_id++;
 
-    double r = (wp.left_width > wp.right_width) ? wp.left_width: wp.right_width;
+    double r = (wp.left_width > wp.right_width) ? wp.left_width : wp.right_width;
     //stop line cannot be right on waypoint with current rebuild_decision_maker
     double epsilon_x = cos(yaw) * 0.001;
     double epsilon_y = sin(yaw) * 0.001;
@@ -1131,13 +1182,18 @@ void createWhitelines(const autoware_map::AutowareMapHandler &awmap,
     auto waypoint = awmap_lane.getStartWaypoint();
     double prev_yaw = getAngleToNextWaypoint(awmap_lane.getStartWaypoint(),awmap_lane.lane_id);
     double next_yaw = getAngleToNextWaypoint(awmap_lane.getStartWaypoint(),awmap_lane.lane_id);
-
+    double epsilon = 1e-6;
     for(auto waypoint : awmap_lane.getWaypoints())
     {
       autoware_map_msgs::WaypointRelation tmp;
       if(waypoint->waypoint_id == awmap_lane.end_waypoint_id ) {
         next_yaw = prev_yaw;
       }else{
+        autoware_map::Waypoint next =*( waypoint->getNextWaypoint(awmap_lane.lane_id) );
+        if ( distance2d(*waypoint->getPointPtr(), *next.getPointPtr()) < epsilon)
+        { 
+          continue;
+        }
         next_yaw = getAngleToNextWaypoint(waypoint,awmap_lane.lane_id);
       }
 
@@ -1191,7 +1247,7 @@ void createWhitelines(const autoware_map::AutowareMapHandler &awmap,
         vmap_white_line_right.type =vector_map_msgs::WhiteLine::DASHED_LINE_BLANK;
       }else if(awmap_lane.lane_number == awmap_lane.num_of_lanes)
       {
-        vmap_white_line_right.color = 'Y';
+        vmap_white_line_right.color = 'W';
         vmap_white_line_right.type = vector_map_msgs::WhiteLine::SOLID_LINE;
       }
       else{
@@ -1242,15 +1298,29 @@ void createWhitelines(const autoware_map::AutowareMapHandler &awmap,
 void createDummyUtilityPoles(const std::vector<vector_map_msgs::Pole> vmap_poles,
                              std::vector<vector_map_msgs::UtilityPole> &vmap_utility_poles)
 {
-    int id = 1;
-    for(auto pole: vmap_poles)
-    {
-      vector_map_msgs::UtilityPole utility_pole;
-      utility_pole.id = id++;
-      utility_pole.plid = pole.plid;
-      utility_pole.linkid = 0;
-      vmap_utility_poles.push_back(utility_pole);
-    }
+  int id = 1;
+  for(auto pole : vmap_poles)
+  {
+    vector_map_msgs::UtilityPole utility_pole;
+    utility_pole.id = id++;
+    utility_pole.plid = pole.plid;
+    utility_pole.linkid = 0;
+    vmap_utility_poles.push_back(utility_pole);
+  }
+}
+
+double distance2d(const autoware_map_msgs::Point p1, const autoware_map_msgs::Point p2)
+{
+  geometry_msgs::Point geo_p1, geo_p2;
+  
+  geo_p1.x = p1.x;
+  geo_p1.y = p1.y;
+  geo_p1.z = 0;
+  geo_p2.x = p2.x;
+  geo_p2.y = p2.y;
+  geo_p2.z = 0;
+  
+  return amathutils::find_distance(geo_p1, geo_p2);  
 }
 
 //keep angles within (M_PI, -M_PI]
@@ -1287,17 +1357,24 @@ double getAngleAverage(const std::vector<double> angles)
 
 double convertDecimalToDDMMSS(const double decimal)
 {
-  int degree, minutes,seconds;
-  degree = floor(decimal);
-  minutes = floor( (decimal - degree ) * 60);
-  seconds = floor( (decimal - degree - minutes * 1.0 / 60) * 3600);
-  return degree + minutes * 0.01 + seconds * 0.0001;
+  int sign, degree, minutes, seconds;
+  if( decimal < 0 )
+    sign = -1;
+  else
+    sign = 1; 
+    
+  double unsigned_decimal = sign * decimal;
+  
+  degree = floor(unsigned_decimal);
+  minutes = floor( (unsigned_decimal - degree ) * 60);
+  seconds = floor( (unsigned_decimal - degree - minutes * 1.0 / 60) * 3600);
+  return sign * (degree + minutes * 0.01 + seconds * 0.0001);
 }
 
 
 void getMinMax(autoware_map_msgs::Point &min, autoware_map_msgs::Point &max, const std::vector<autoware_map_msgs::Point>points)
 {
-  if(points.empty()){
+  if(points.empty()) {
     ROS_ERROR_STREAM("No points to calculate min/max point!");
   }
   min = max = points.front();

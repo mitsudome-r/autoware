@@ -120,6 +120,8 @@ void createDummyUtilityPoles(const std::vector<vector_map_msgs::Pole> vmap_poles
                              std::vector<vector_map_msgs::UtilityPole> &vmap_utility_poles);
 void convertPoint(vector_map_msgs::Point &vmap_point,const autoware_map_msgs::Point awmap_point);
 
+
+double distance2d(const autoware_map_msgs::Point p1, const autoware_map_msgs::Point p2);
 //keep angles within (M_PI, -M_PI]
 double addAngles(double angle1, double angle2);
 double getAngleAverage(std::vector<double> angles);

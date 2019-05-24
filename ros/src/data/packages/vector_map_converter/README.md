@@ -11,7 +11,7 @@ This package contains converters to convert different map formats into Vector Ma
 This node converts Autoware Map Format into vector map csv files:
 
 ### Usage
-rosrun vector_map_converter autowaremap2vectormap [autoware map csv files]
+rosrun vector_map_converter autowaremap2vectormap _map_dir:=[directory of autoware_map csv] _save_dir:=[]
 
 ### Output Files
 - area.csv

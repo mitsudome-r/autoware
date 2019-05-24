@@ -14,7 +14,10 @@ opendrive2autoware_converter is a rosnode that convert OpenDRIVE map format (.xo
 ### How to use: 
 ```
 rosrun vector_map_converter opendrive2autowaremap param1 param2/ param3/ param4
-
+```
+example:
+```
+rosrun vector_map_converter opendrive2autowaremap samplesample1.1.xodr Autoware/ros/src/data/packages/vector_map_converter/countries/ autoware_map/ 0.5 _keep_right:=True
 ```
 
 + param1: file path, source OpenDRIVE map (.xodr) file. 
@@ -23,7 +26,7 @@ rosrun vector_map_converter opendrive2autowaremap param1 param2/ param3/ param4
 + param4: float, optional, waypoints resolution, default is 0.5
 
 Optional ROS parameter
-+ ~keep_right: bool, optional, specify whether car should drive in right lane or left lane. 
++ \_keep\_right: bool, optional(default: True), specify whether car should drive in right lane or left lane. 
 
 ## autowaremap2vectormap node
 This node converts Autoware Map Format into vector map csv files:

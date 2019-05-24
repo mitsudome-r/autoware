@@ -7,6 +7,21 @@ This package contains converters to convert different map formats into Vector Ma
 3. cd ros/
 4. ./colcon_release
 
+## opendrive2autoware_converter
+
+opendrive2autoware_converter is a rosnode that convert OpenDRIVE map format (.xodr) to autoware map format (list of .csv files).
+
+### How to use: 
+```
+rosrun autoware_map opendrive2autoware_converter param1 param2/ param3/ param4
+
+```
+
++ param1: file path, source OpenDRIVE map (.xodr) file. 
++ param2: folder path, country code definition files, for traffic signs and road marks.
++ param3: folder path, destination folder to write the autoware map .csv files.
++ param4: float, optional, waypoints resolution, default is 0.5
+
 ## autowaremap2vectormap node
 This node converts Autoware Map Format into vector map csv files:
 

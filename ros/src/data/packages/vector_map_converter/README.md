@@ -2,10 +2,38 @@
 This package contains converters to convert different map formats into Vector Map information used by Autoware.
 
 ## Installation
-1. cd Autoware/
-2. git submodule update --init --recursive
-3. cd ros/
-4. ./colcon_release
+1. Follow the official Source Build Instruction from https://github.com/autowarefoundation/autoware/wiki/Source-Build. This branch is made from v1.11 so follow the steps for "Build with colcon (v1.11 and above)" for building. 
+
+2. Switch to this branch
+```
+$ cd ~/Autoware`
+$ git remote add mitsudome-r https://github.com/mitsudome-r/Autoware.git`
+$ git fetch mitsudome-r
+$ git checkout mitsudome-r/feature/vectormap_converter
+```
+3. Add Lanelet2 and its dependency packages. 
+```
+$ sudo apt-get install libboost-dev libeigen3-dev libgeographic-dev libpugixml-dev libpython-dev libboost-python-dev python-catkin-tools
+$ git submodule update --init --recursive
+$ cd ~/Autoware/ros/
+$ rosdep update
+$ rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
+```
+You might see following error since lanelet2 does not have correct packages.xml files. They are installed by apt-get so you don't have to worry about them. 
+```
+ERROR: the following packages/stacks could not have their rosdep keys resolved
+to system dependencies:
+lanelet2_projection: Cannot locate rosdep definition for [libgeographic-dev]
+lanelet2_io: Cannot locate rosdep definition for [pugixml]
+mrt_cmake_modules: Cannot locate rosdep definition for [coverage]
+lanelet2_python: Cannot locate rosdep definition for [boost-python]
+
+```
+
+4. Build by 
+```
+$ ./colcon_release
+```
 
 ## autowaremap2vectormap node
 This node converts Autoware Map Format into vector map csv files:

@@ -6,8 +6,8 @@ This package contains converters to convert different map formats into Vector Ma
 
 2. Switch to this branch
 ```
-$ cd ~/Autoware`
-$ git remote add mitsudome-r https://github.com/mitsudome-r/Autoware.git`
+$ cd ~/Autoware
+$ git remote add mitsudome-r https://github.com/mitsudome-r/Autoware.git
 $ git fetch mitsudome-r
 $ git checkout mitsudome-r/feature/vectormap_converter
 ```

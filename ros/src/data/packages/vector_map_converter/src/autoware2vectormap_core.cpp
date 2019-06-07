@@ -493,7 +493,7 @@ void createDTLanes(const autoware_map::AutowareMapHandler &awmap,
   // key = waypoint_relation
   // value = lnid;
   std::unordered_map<uint_pair, unsigned int, boost::hash<uint_pair> > wp_relation2lnid;
-  unsigned int id = 1;
+  unsigned int id = 0;
   for ( auto r : awmap_waypoint_relations )
   {
     auto key = std::make_pair(r.waypoint_id,r.next_waypoint_id);
@@ -545,21 +545,21 @@ void createDTLanes(const autoware_map::AutowareMapHandler &awmap,
     vmap_lane.flid3 = 0;
     vmap_lane.flid4 = 0;
     if(merging_idx.size() >= 1)
-      vmap_lane.blid = merging_idx.at(0);
+      vmap_lane.blid = merging_idx.at(0) + 1;
     if(merging_idx.size() >= 2)
-      vmap_lane.blid2 = merging_idx.at(1);
+      vmap_lane.blid2 = merging_idx.at(1) + 1;
     if(merging_idx.size() >= 3)
-      vmap_lane.blid3 = merging_idx.at(2);
+      vmap_lane.blid3 = merging_idx.at(2) + 1;
     if(merging_idx.size() >= 4)
-      vmap_lane.blid4 = merging_idx.at(3);
+      vmap_lane.blid4 = merging_idx.at(3) + 1;
     if(branching_idx.size() >= 1)
-      vmap_lane.flid = branching_idx.at(0);
+      vmap_lane.flid = branching_idx.at(0) + 1;
     if(branching_idx.size() >= 2)
-      vmap_lane.flid2 = branching_idx.at(1);
+      vmap_lane.flid2 = branching_idx.at(1) + 1;
     if(branching_idx.size() >= 3)
-      vmap_lane.flid3 = branching_idx.at(2);
+      vmap_lane.flid3 = branching_idx.at(2) + 1;
     if(branching_idx.size() >= 4)
-      vmap_lane.flid4 = branching_idx.at(3);
+      vmap_lane.flid4 = branching_idx.at(3) + 1;
     vmap_lane.bnid = awmap_waypoint.waypoint_id;
     vmap_lane.fnid = awmap_next_waypoint.waypoint_id;
     vmap_lane.span =  awmap_waypoint_relation.distance;

@@ -21,3 +21,6 @@
 [submodule "ros/src/data/packages/Lanelet2"]
 	path = ros/src/data/packages/Lanelet2
 	url = https://github.com/fzi-forschungszentrum-informatik/Lanelet2
+[submodule "ros/src/util/packages/ds4"]
+	path = ros/src/util/packages/ds4
+	url = https://github.com/tier4/ds4

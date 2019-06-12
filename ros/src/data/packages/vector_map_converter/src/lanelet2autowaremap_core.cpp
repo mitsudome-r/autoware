@@ -306,6 +306,7 @@ std::vector<BasicPoint3d>  fine_centerline(const ConstLanelet &lanelet)
   prev_pt = left.front().basicPoint();
   for(BasicPoint3d pt : left)
   {
+    if(left_points.size() >= partitions) break;
 
     //continue if not points are made
     double local_distance = geometry::distance2d(pt, prev_pt);
@@ -333,6 +334,7 @@ std::vector<BasicPoint3d>  fine_centerline(const ConstLanelet &lanelet)
   right_points.push_back(right.front());
   for(BasicPoint3d pt : right)
   {
+    if(right_points.size() >= partitions) break;
     //continue if not points are made
     double local_distance = geometry::distance2d(pt, prev_pt);
     if(local_distance +  residue < right_resolution) {
@@ -954,7 +956,7 @@ void convertLanelet2AutowareMap(LaneletMapPtr map,
                    return iter != waypoint_id_correction.end();
                  });
   waypoints.erase(result, waypoints.end());
-  
+
   for( auto &point : points)
   {
     fixPointCoordinate(point);

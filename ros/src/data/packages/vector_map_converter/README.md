@@ -2,7 +2,7 @@
 This package contains converters to convert different map formats into Vector Map information used by Autoware.
 
 ## Installation
-1. Follow the official Source Build Instruction from https://github.com/autowarefoundation/autoware/wiki/Source-Build. This branch is made from v1.11 so follow the steps for "Build with colcon (v1.11 and above)" for building. 
+1. Follow the official Source Build Instruction from https://github.com/autowarefoundation/autoware/wiki/Source-Build. This branch is made from v1.11 so follow the steps for "Build with colcon (v1.11 and above)" for building.
 
 2. Switch to this branch
 ```
@@ -11,7 +11,7 @@ $ git remote add mitsudome-r https://github.com/mitsudome-r/Autoware.git
 $ git fetch mitsudome-r
 $ git checkout mitsudome-r/feature/vectormap_converter
 ```
-3. Add Lanelet2 and its dependency packages. 
+3. Add Lanelet2 and its dependency packages.
 ```
 $ sudo apt-get install libboost-dev libeigen3-dev libgeographic-dev libpugixml-dev libpython-dev libboost-python-dev python-catkin-tools
 $ git submodule update --init --recursive
@@ -19,7 +19,7 @@ $ cd ~/Autoware/ros/
 $ rosdep update
 $ rosdep install -y --from-paths src --ignore-src --rosdistro $ROS_DISTRO
 ```
-You might see following error since lanelet2 does not have correct packages.xml files. They are installed by apt-get so you don't have to worry about them. 
+You might see following error since lanelet2 does not have correct packages.xml files. They are installed by apt-get so you don't have to worry about them.
 ```
 ERROR: the following packages/stacks could not have their rosdep keys resolved
 to system dependencies:
@@ -30,7 +30,7 @@ lanelet2_python: Cannot locate rosdep definition for [boost-python]
 
 ```
 
-4. Build by 
+4. Build by
 ```
 $ ./colcon_release
 ```
@@ -91,6 +91,13 @@ This node converts lanelet2 map into vector map csv files used in Autoware.
 `rosrun vector_map_converter lanelet2vectormap _map_file:=<path to lanelet map> _origin_lat:=<origin for projection>  _origin_lon:=<origin for projection>`<br>
 For sample lanelet map:<br>
 `rosrun vector_map_converter lanelet2vectormap _map_file:=~/catkin_ws/src/vector_map_converter/lanelet2/lanelet2_maps/res/mapping_example.osm _origin_lat:=49.00331750371  _origin_lon:=8.42403027399`
+
+Origin can be anywhere near your map location.
+For example, you can use lat/lon value of the first point that appears in your osm file.
+Lanelet2 default loader needs an origin to load a map and use the origin to convert it to lat/lon to xyz coordinates at loading time.
+However, the xyz coordinate will be then converted into MGRS coordinate. (x=northing and y=easting within 100km grid of MGRS)
+Therefore, the origin does not affect the final output of the converter, but user needs to specify it to satisfy the needs of lanelet2 loader.
+(TODO: implement custom projector so that user won't need to set origin in the future.)
 
 ### Output Files
 - area.csv

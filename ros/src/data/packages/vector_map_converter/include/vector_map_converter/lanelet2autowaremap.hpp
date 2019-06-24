@@ -65,7 +65,7 @@
 #include <vector_map_msgs/WayArea.h>
 #include <vector_map_msgs/WhiteLine.h>
 
-#define USE_FIXED_HEIGHT 1
+#define USE_FIXED_HEIGHT 0
 #define FIXED_HEIGHT 110
 
 void convertLanelet2AutowareMap(lanelet::LaneletMapPtr map,

@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - v*
+      - \d+.\d+
   schedule:
     - cron: 0 0 1,15 * *
   workflow_dispatch:

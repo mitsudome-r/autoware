@@ -25,22 +25,22 @@ RUN mkdir -p ~/.ssh \
   && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 ## Set up development environment
-RUN --mount=type=ssh \
-  # ./setup-dev-env.sh -y $SETUP_ARGS universe \
-  && pip uninstall -y ansible ansible-core \
-  && mkdir src \
-  && vcs import src < autoware.repos \
-  && rosdep update \
-  && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
+# RUN --mount=type=ssh \
+#   # ./setup-dev-env.sh -y $SETUP_ARGS universe \
+#   && pip uninstall -y ansible ansible-core \
+#   && mkdir src \
+#   && vcs import src < autoware.repos \
+#   && rosdep update \
+#   && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
+#   && apt-get clean \
+#   && rm -rf /var/lib/apt/lists/*
 
-## Clean up unnecessary files
-RUN rm -rf \
-  "$HOME"/.cache \
-  /etc/apt/sources.list.d/cuda*.list \
-  /etc/apt/sources.list.d/docker.list \
-  /etc/apt/sources.list.d/nvidia-docker.list
+# ## Clean up unnecessary files
+# RUN rm -rf \
+#   "$HOME"/.cache \
+#   /etc/apt/sources.list.d/cuda*.list \
+#   /etc/apt/sources.list.d/docker.list \
+#   /etc/apt/sources.list.d/nvidia-docker.list
 
 ## Register Vulkan GPU vendors
 ADD "https://gitlab.com/nvidia/container-images/vulkan/raw/dc389b0445c788901fda1d85be96fd1cb9410164/nvidia_icd.json" /etc/vulkan/icd.d/nvidia_icd.json

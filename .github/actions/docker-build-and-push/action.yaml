@@ -41,7 +41,7 @@ runs:
           tags+=("type=schedule,pattern=latest")
           tags+=("type=schedule,pattern={{date 'YYYYMMDD'}}")
           tags+=("type=semver,pattern={{version}}")
-          tags+=("type=match, pattern=\d.\d.")
+          tags+=("type=match, pattern=\d.\d")
         fi
 
         # Workaround for multiline strings

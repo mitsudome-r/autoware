@@ -26,7 +26,7 @@ RUN mkdir -p ~/.ssh \
 
 ## Set up development environment
 RUN --mount=type=ssh \
-  ./setup-dev-env.sh -y $SETUP_ARGS universe \
+  # ./setup-dev-env.sh -y $SETUP_ARGS universe \
   && pip uninstall -y ansible ansible-core \
   && mkdir src \
   && vcs import src < autoware.repos \
@@ -57,9 +57,9 @@ FROM devel as prebuilt
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 ## Build and change permission for runtime data conversion
-RUN source /opt/ros/"$ROS_DISTRO"/setup.bash \
-  && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release \
-  && find /autoware/install -type d -exec chmod 777 {} \;
+# RUN source /opt/ros/"$ROS_DISTRO"/setup.bash \
+#   && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release \
+#   && find /autoware/install -type d -exec chmod 777 {} \;
 
 ## Create entrypoint
 RUN echo "source /autoware/install/setup.bash" > /etc/bash.bashrc

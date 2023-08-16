@@ -75,18 +75,18 @@ repositories:
     type: git
     url: https://github.com/tier4/velodyne_vls.git
     version: 55dffdf3b3ef889e149977dc6ab1da124b5176c9
-  sensor_kit/sample_sensor_kit_launch:
+  sensor_kit/external/edgar_sensor_kit:
     type: git
-    url: https://github.com/autowarefoundation/sample_sensor_kit_launch.git
-    version: 5900214b7344a275c8a321bf78f27f8a197e1312
+    url: https://github.com/mitsudome-r/edgar_sensor_kit.git
+    version: main
   sensor_kit/external/awsim_sensor_kit_launch:
     type: git
     url: https://github.com/RobotecAI/awsim_sensor_kit_launch.git
     version: a1f5993407ffeb4abcf97a49cd1b4034768d97b4
-  vehicle/sample_vehicle_launch:
+  vehicle/external/edgar_vehicle_launch:
     type: git
-    url: https://github.com/autowarefoundation/sample_vehicle_launch.git
-    version: 157238ca77de7b0a59f71a0b28f456741fab3ca2
+    url: https://github.com/mitsudome-r/edgar_vehicle_launch.git
+    version: main
   vehicle/external/pacmod_interface:
     type: git
     url: https://github.com/tier4/pacmod_interface.git

@@ -21,8 +21,8 @@ repositories:
     version: e1795354161ed54d66659366262578863bd2b862
   universe/autoware.universe:
     type: git
-    url: https://github.com/autowarefoundation/autoware.universe.git
-    version: 4eef0870d82431f356edcb5d00f7262d35dc2ff9
+    url: https://github.com/mitsudome-r/autoware.universe.git
+    version: edgar_integration
   universe/external/tier4_ad_api_adaptor:
     type: git
     url: https://github.com/tier4/tier4_ad_api_adaptor.git
@@ -62,7 +62,7 @@ repositories:
   launcher/autoware_launch:
     type: git
     url: git@github.com:mitsudome-r/autoware_launch
-    version: edgar_localization_launch
+    version: edgar_integration_launch
   sensor_component/external/sensor_component_description:
     type: git
     url: https://github.com/tier4/sensor_component_description.git

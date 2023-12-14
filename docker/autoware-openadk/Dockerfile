@@ -111,7 +111,9 @@ RUN --mount=type=ssh \
 
 # Bugfix rviz2 black-screen problem with some nvidia drivers: https://github.com/ros2/rviz/issues/948
 RUN apt update && apt install -y software-properties-common && add-apt-repository ppa:kisak/kisak-mesa && apt install -y \
-  libegl-mesa0 libegl1-mesa-dev libgbm-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri libglapi-mesa libglx-mesa0 vim unzip
+  libegl-mesa0 libegl1-mesa-dev libgbm-dev libgbm1 libgl1-mesa-dev libgl1-mesa-dri libglapi-mesa libglx-mesa0 vim unzip \
+  && apt-get autoremove -y && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Copy bash aliases
 COPY docker/autoware-openadk/etc/.bash_aliases /root/.bash_aliases

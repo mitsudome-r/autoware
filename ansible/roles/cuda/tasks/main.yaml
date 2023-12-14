@@ -29,16 +29,24 @@
   become: true
   ansible.builtin.apt:
     name:
-      - cuda-cudart-dev-{{ cuda__dash_case_cuda_version.stdout }}
       - cuda-command-line-tools-{{ cuda__dash_case_cuda_version.stdout }}
       - cuda-minimal-build-{{ cuda__dash_case_cuda_version.stdout }}
-      - cuda-libraries-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - cuda-nvml-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - libnpp-dev-{{ cuda__dash_case_cuda_version.stdout }}
       - libcusparse-dev-{{ cuda__dash_case_cuda_version.stdout }}
       - libcublas-dev-{{ cuda__dash_case_cuda_version.stdout }}
-      - libnccl-dev
+      - libcurand-dev-{{ dash_case_cuda_version.stdout }}
     update_cache: true
+  when: install_devel == 'true'
+
+- name: Install CUDA libraries except for cuda-drivers
+  become: true
+  ansible.builtin.apt:
+    name:
+      - cuda-minimal-build-{{ dash_case_cuda_version.stdout }}
+      - libcusparse-{{ dash_case_cuda_version.stdout }}
+      - libcublas-{{ dash_case_cuda_version.stdout }}
+      - libcurand-{{ dash_case_cuda_version.stdout }}
+    update_cache: true
+  when: install_devel == 'false'
 
 - name: Install extra CUDA libraries for x86_64
   become: true
@@ -71,3 +79,27 @@
     state: present
     create: true
     mode: 0644
+
+- name: Download NVIDIA Vulkan ICD JSON
+  ansible.builtin.get_url:
+    url: https://gitlab.com/nvidia/container-images/vulkan/raw/dc389b0445c788901fda1d85be96fd1cb9410164/nvidia_icd.json
+    dest: /etc/vulkan/icd.d/nvidia_icd.json
+    mode: '0644'
+
+- name: Download NVIDIA GLVND EGL Vendor JSON
+  ansible.builtin.get_url:
+    url: https://gitlab.com/nvidia/container-images/opengl/raw/5191cf205d3e4bb1150091f9464499b076104354/glvnd/runtime/10_nvidia.json
+    dest: /etc/glvnd/egl_vendor.d/10_nvidia.json
+    mode: '0644'
+
+- name: Create directory for OpenCL GPU vendors
+  ansible.builtin.file:
+    path: /etc/OpenCL/vendors
+    state: directory
+    mode: '0755'
+
+- name: Register NVIDIA OpenCL
+  ansible.builtin.copy:
+    content: "libnvidia-opencl.so.1"
+    dest: /etc/OpenCL/vendors/nvidia.icd
+    mode: '0644'

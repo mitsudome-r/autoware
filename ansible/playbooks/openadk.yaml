@@ -35,21 +35,22 @@
       when: prompt_install_nvidia != 'y'
   roles:
     # Autoware base dependencies
-    - role: autoware.dev_env.ros2
-    - role: autoware.dev_env.ros2_dev_tools
     - role: autoware.dev_env.rmw_implementation
+      when: module == 'base'
     - role: autoware.dev_env.gdown
+      when: module == 'base'
 
-    # Autoware module dependencies
+    # Module specific dependencies
     - role: autoware.dev_env.geographiclib
+      when: module == 'main-perception' or module == 'all'
     - role: autoware.dev_env.cuda
-      when: prompt_install_nvidia == 'y'
-    - role: autoware.dev_env.pacmod
-      when: rosdistro != 'rolling'
+      when: module == 'main-perception' or module == 'all'
     - role: autoware.dev_env.tensorrt
-      when: prompt_install_nvidia == 'y'
-  
-    # Autoware devel dependencies
+      when: module == 'main-perception' or module == 'all'
+    - role: autoware.dev_env.pacmod
+      when: module == 'planning-control' or module == 'main-perception' or module == 'all'
+    
+    # Development environment
     - role: autoware.dev_env.devel
       when: install_devel == 'true'
 

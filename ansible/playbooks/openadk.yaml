@@ -1,17 +1,6 @@
 - name: Set up source development environments for Autoware Universe
   hosts: localhost
   connection: local
-  vars_prompt:
-    - name: prompt_install_nvidia
-      prompt: |-
-        [Warning] Some Autoware components depend on the CUDA, cuDNN and TensorRT NVIDIA libraries which have end-user license agreements that should be reviewed before installation.
-        Install NVIDIA libraries? [y/N]
-      private: false
-    - name: prompt_download_artifacts
-      prompt: |-
-        [Warning] Should the ONNX model files and other artifacts be downloaded alongside setting up the development environment.
-        Download artifacts? [y/N]
-      private: false
   pre_tasks:
     - name: Verify OS
       ansible.builtin.fail:
@@ -26,13 +15,6 @@
           - cuda_version: "{{ cuda_version }}"
           - cudnn_version: "{{ cudnn_version }}"
           - tensorrt_version: "{{ tensorrt_version }}"
-
-    - name: Show a warning if the NVIDIA libraries will not be installed
-      ansible.builtin.pause:
-        seconds: 10
-        prompt: |
-          [Warning] Skipping installation of NVIDIA libraries. Please manually install them if you plan to use any dependent components.
-      when: prompt_install_nvidia != 'y'
   roles:
     # Autoware base dependencies
     - role: autoware.dev_env.rmw_implementation

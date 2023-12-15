@@ -80,9 +80,9 @@ docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/dock
     --set "*.args.ROS_DISTRO=$rosdistro" \
     --set "*.args.BASE_IMAGE=$base_image" \
     --set "*.args.SETUP_ARGS=$setup_args" \
-    --set "base.tags=ghcr.io/autowarefoundation/autoware-openadkv3:base-$rosdistro-latest$image_name_suffix" \
-    --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadkv3:devel-$rosdistro-latest$image_name_suffix" \
-    --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadkv3:prebuilt-$rosdistro-latest$image_name_suffix" \
+    --set "base.tags=ghcr.io/autowarefoundation/autoware-openadk:base-$rosdistro-latest$image_name_suffix" \
+    --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadk:devel-$rosdistro-latest$image_name_suffix" \
+    --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadk:prebuilt-$rosdistro-latest$image_name_suffix" \
     "${targets[@]}"
 
 # Build runtime images
@@ -95,7 +95,7 @@ if [ "$option_no_prebuilt" != "true" ]; then
         --set "*.args.ROS_DISTRO=$rosdistro" \
         --set "*.args.BASE_IMAGE=$base_image" \
         --set "*.args.SETUP_ARGS=$setup_args" \
-        --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadkv3:monolithic-$rosdistro-latest$image_name_suffix" \
+        --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadk:monolithic-$rosdistro-latest$image_name_suffix" \
         monolithic
 fi
 set +x

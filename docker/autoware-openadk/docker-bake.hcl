@@ -1,5 +1,5 @@
 group "default" {
-  targets = ["base", "devel", "prebuilt", "monolithic"]
+  targets = ["base", "devel", "prebuilt"]
 }
 
 // For docker/metadata-action
@@ -10,7 +10,7 @@ target "docker-metadata-action-monolithic" {}
 
 target "base" {
   inherits = ["docker-metadata-action-base"]
-  dockerfile = "docker/autoware-openadk/base/Dockerfile"
+  dockerfile = "docker/autoware-openadk/Dockerfile"
   target = "base"
 }
 

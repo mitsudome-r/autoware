@@ -42,6 +42,10 @@ while [ "$1" != "" ]; do
         # Set download artifacts option
         option_download_artifacts=true
         ;;
+    --module)
+        option_module="$2"
+        shift
+        ;;
     *)
         args+=("$1")
         ;;
@@ -107,6 +111,11 @@ if [ "$option_yes" = "true" ] || [ "$option_download_artifacts" = "true" ]; then
 fi
 
 ansible_args+=("--extra-vars" "data_dir=$option_data_dir")
+
+# Check module option
+if [ "$option_module" != "" ]; then
+    ansible_args+=("--extra-vars" "module=$option_module")
+fi
 
 # Load env
 source "$SCRIPT_DIR/amd64.env"

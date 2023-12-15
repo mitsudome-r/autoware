@@ -31,7 +31,6 @@ if [ "$option_no_cuda" = "true" ]; then
     setup_args="--no-nvidia"
     image_name_suffix=""
 else
-    setup_args="--no-cuda-drivers"
     image_name_suffix="-cuda"
 fi
 
@@ -53,6 +52,16 @@ else
     fi
 fi
 
+# Set arch lib dir
+if [ "$platform" = "linux/arm64" ]; then
+    lib_dir="aarch64"
+elif [ "$platform" = "linux/amd64" ]; then
+    lib_dir="x86_64"
+else
+    echo "Unsupported platform: $platform"
+    exit 1
+fi
+
 # Load env
 source "$WORKSPACE_ROOT/amd64.env"
 if [ "$platform" = "linux/arm64" ]; then
@@ -63,14 +72,30 @@ fi
 export BUILDKIT_STEP_LOG_MAX_SIZE=10000000
 
 set -x
-docker buildx bake --no-cache --load --progress=plain -f "$SCRIPT_DIR/autoware-universe/docker-bake.hcl" \
+# Build base images
+docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/docker-bake.hcl" \
     --set "*.context=$WORKSPACE_ROOT" \
     --set "*.ssh=default" \
     --set "*.platform=$platform" \
     --set "*.args.ROS_DISTRO=$rosdistro" \
     --set "*.args.BASE_IMAGE=$base_image" \
     --set "*.args.SETUP_ARGS=$setup_args" \
-    --set "devel.tags=ghcr.io/autowarefoundation/autoware-universe:$rosdistro-latest$image_name_suffix" \
-    --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-universe:$rosdistro-latest-prebuilt$image_name_suffix" \
+    --set "base.tags=ghcr.io/autowarefoundation/autoware-openadkv3:base-$rosdistro-latest$image_name_suffix" \
+    --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadkv3:devel-$rosdistro-latest$image_name_suffix" \
+    --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadkv3:prebuilt-$rosdistro-latest$image_name_suffix" \
     "${targets[@]}"
+
+# Build runtime images
+if [ "$option_no_prebuilt" != "true" ]; then
+    docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/docker-bake.hcl" \
+        --set "*.context=$WORKSPACE_ROOT" \
+        --set "*.ssh=default" \
+        --set "*.platform=$platform" \
+        --set "*.args.LIB_DIR=$lib_dir" \
+        --set "*.args.ROS_DISTRO=$rosdistro" \
+        --set "*.args.BASE_IMAGE=$base_image" \
+        --set "*.args.SETUP_ARGS=$setup_args" \
+        --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadkv3:monolithic-$rosdistro-latest$image_name_suffix" \
+        monolithic
+fi
 set +x

@@ -27,9 +27,9 @@
     - role: autoware.dev_env.geographiclib
       when: module == 'main-perception' or module == 'all'
     - role: autoware.dev_env.cuda
-      when: module == 'main-perception' or module == 'all'
+      when: module == 'main-perception' or module == 'all' and prompt_install_nvidia=='y'
     - role: autoware.dev_env.tensorrt
-      when: module == 'main-perception' or module == 'all'
+      when: module == 'main-perception' or module == 'all' and prompt_install_nvidia=='y'
     - role: autoware.dev_env.pacmod
       when: module == 'planning-control' or module == 'main-perception' or module == 'all'
     

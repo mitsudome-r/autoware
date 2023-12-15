@@ -42,6 +42,10 @@ while [ "$1" != "" ]; do
         # Set download artifacts option
         option_download_artifacts=true
         ;;
+    --docker)
+        # Set download artifacts option
+        option_docker=true
+        ;;
     --module)
         option_module="$2"
         shift
@@ -55,6 +59,12 @@ done
 
 # Select installation type
 target_playbook="autoware.dev_env.universe" # default
+
+# Set-up docker environment
+if [ "$option_docker" = "true" ]; then
+    target_playbook="autoware.dev_env.docker"
+    ansible_args+=("--extra-vars" "cuda_install_drivers=true")
+fi
 
 if [ ${#args[@]} -ge 1 ]; then
     target_playbook="autoware.dev_env.${args[0]}"

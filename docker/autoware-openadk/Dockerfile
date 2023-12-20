@@ -3,7 +3,6 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE as base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
-ARG SETUP_ARGS
 
 # Install apt packages
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
@@ -40,6 +39,7 @@ CMD ["/bin/bash"]
 FROM base as devel
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
+ARG SETUP_ARGS
 
 # Set up development environment
 RUN --mount=type=ssh \
@@ -89,6 +89,7 @@ FROM base as monolithic
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ARG LIB_DIR
+ARG SETUP_ARGS
 
 # Set up runtime environment
 COPY autoware.repos /autoware/

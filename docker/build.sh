@@ -72,7 +72,7 @@ fi
 export BUILDKIT_STEP_LOG_MAX_SIZE=10000000
 
 set -x
-# Build base images
+# Build images
 docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/docker-bake.hcl" \
     --set "*.context=$WORKSPACE_ROOT" \
     --set "*.ssh=default" \
@@ -80,22 +80,10 @@ docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/dock
     --set "*.args.ROS_DISTRO=$rosdistro" \
     --set "*.args.BASE_IMAGE=$base_image" \
     --set "*.args.SETUP_ARGS=$setup_args" \
+    --set "*.args.LIB_DIR=$lib_dir" \
     --set "base.tags=ghcr.io/autowarefoundation/autoware-openadk:base-$rosdistro-latest$image_name_suffix" \
     --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadk:devel-$rosdistro-latest$image_name_suffix" \
     --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadk:prebuilt-$rosdistro-latest$image_name_suffix" \
+    --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadk:monolithic-$rosdistro-latest$image_name_suffix" \
     "${targets[@]}"
-
-# Build runtime images
-if [ "$option_no_prebuilt" != "true" ]; then
-    docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/docker-bake.hcl" \
-        --set "*.context=$WORKSPACE_ROOT" \
-        --set "*.ssh=default" \
-        --set "*.platform=$platform" \
-        --set "*.args.LIB_DIR=$lib_dir" \
-        --set "*.args.ROS_DISTRO=$rosdistro" \
-        --set "*.args.BASE_IMAGE=$base_image" \
-        --set "*.args.SETUP_ARGS=$setup_args" \
-        --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadk:monolithic-$rosdistro-latest$image_name_suffix" \
-        monolithic
-fi
 set +x

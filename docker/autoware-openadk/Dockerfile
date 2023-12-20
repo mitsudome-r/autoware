@@ -3,6 +3,7 @@ ARG BASE_IMAGE
 FROM $BASE_IMAGE as base
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
+ARG SETUP_ARGS
 
 # Install apt packages
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
@@ -42,7 +43,7 @@ ARG ROS_DISTRO
 
 # Set up development environment
 RUN --mount=type=ssh \
-  ./setup-dev-env.sh -y --module all --no-cuda-drivers openadk \
+  ./setup-dev-env.sh -y --module all ${SETUP_ARGS} --no-cuda-drivers openadk \
   && pip uninstall -y ansible ansible-core \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache \
   && find / -name 'libcu*.a' -delete \
@@ -92,7 +93,7 @@ ARG LIB_DIR
 # Set up runtime environment
 COPY autoware.repos /autoware/
 RUN --mount=type=ssh \
-  ./setup-dev-env.sh -y --module all --no-cuda-drivers --runtime openadk \
+  ./setup-dev-env.sh -y --module all ${SETUP_ARGS} --no-cuda-drivers --runtime openadk \
   && pip uninstall -y ansible ansible-core \
   && mkdir src \
   && vcs import src < autoware.repos \

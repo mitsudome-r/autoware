@@ -1,6 +1,5 @@
 # geographiclib
 
-
 ## Inputs
 
 None.

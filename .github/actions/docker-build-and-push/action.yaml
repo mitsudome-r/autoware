@@ -86,7 +86,7 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=-prebuilt${{ inputs.tag-suffix }}
-    
+
     - name: Docker meta for monolithic
       id: meta-monolithic
       uses: docker/metadata-action@v4

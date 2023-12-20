@@ -47,7 +47,7 @@ RUN --mount=type=ssh \
   && pip uninstall -y ansible ansible-core \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache \
   && find / -name 'libcu*.a' -delete \
-  && find / -name 'libnv*.a' -delete 
+  && find / -name 'libnv*.a' -delete
 
 # Copy repository files
 COPY autoware.repos /autoware/
@@ -99,7 +99,7 @@ RUN --mount=type=ssh \
   && mkdir src \
   && vcs import src < autoware.repos \
   && rosdep update \
-  && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \ 
+  && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache \
   && find /usr/lib/$LIB_DIR-linux-gnu -name "*.a" -type f -delete \
   && find / -name "*.o" -type f -delete \

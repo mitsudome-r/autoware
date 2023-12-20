@@ -48,7 +48,7 @@
       when: rosdistro != 'rolling'
     - role: autoware.dev_env.tensorrt
       when: prompt_install_nvidia == 'y'
-  
+
     # Autoware devel dependencies
     - role: autoware.dev_env.devel
       when: install_devel == 'true'

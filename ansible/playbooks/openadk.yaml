@@ -32,7 +32,7 @@
       when: module == 'main-perception' or module == 'all' and prompt_install_nvidia=='y'
     - role: autoware.dev_env.pacmod
       when: module == 'planning-control' or module == 'main-perception' or module == 'all'
-    
+
     # Development environment
     - role: autoware.dev_env.devel
       when: install_devel == 'true'

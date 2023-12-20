@@ -7,4 +7,3 @@ This role installs development dependencies for Autoware.
 None.
 
 ## Manual Installation
-

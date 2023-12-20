@@ -24,5 +24,5 @@ done
 # Launch Autoware with custom map
 echo "Launching Autoware with the map >> "${MAP_PATH}
 docker run -it --rm --net=host --gpus all -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix \
--v ${MAP_PATH}:/autoware_map ghcr.io/autowarefoundation/autoware-openadk:monolithic-humble-latest-cuda \
-ros2 launch autoware_launch autoware.launch.xml map_path:=/autoware_map vehicle_model:=sample_vehicle sensor_model:=sample_sensor_kit
+    -v ${MAP_PATH}:/autoware_map ghcr.io/autowarefoundation/autoware-openadk:monolithic-humble-latest-cuda \
+    ros2 launch autoware_launch autoware.launch.xml map_path:=/autoware_map vehicle_model:=sample_vehicle sensor_model:=sample_sensor_kit

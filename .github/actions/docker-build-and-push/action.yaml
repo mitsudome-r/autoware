@@ -86,18 +86,18 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=-prebuilt${{ inputs.tag-suffix }}
-
-    - name: Docker meta for monolithic
-      id: meta-monolithic
+    
+    - name: Docker meta for monorun
+      id: meta-monorun
       uses: docker/metadata-action@v4
       with:
         images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
         tags: ${{ steps.set-docker-tags.outputs.tags }}
-        bake-target: docker-metadata-action-monolithic
+        bake-target: docker-metadata-action-monorun
         flavor: |
           latest=false
           prefix=${{ inputs.tag-prefix }}
-          suffix=-monolithic${{ inputs.tag-suffix }}
+          suffix=-monorun${{ inputs.tag-suffix }}
 
     - name: Login to GitHub Container Registry
       if: ${{ github.event_name != 'pull_request' }}
@@ -117,7 +117,7 @@ runs:
           ${{ steps.meta-base.outputs.bake-file }}
           ${{ steps.meta-devel.outputs.bake-file }}
           ${{ steps.meta-prebuilt.outputs.bake-file }}
-          ${{ steps.meta-monolithic.outputs.bake-file }}
+          ${{ steps.meta-monorun.outputs.bake-file }}
         provenance: false
         set: |
           ${{ inputs.build-args }}

@@ -61,7 +61,15 @@ RUN --mount=type=ssh \
   && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache
 
+# Instal gosu for sudo
+RUN --mount=type=ssh \
+  apt-get update && apt-get install -y gosu \
+  && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache
+
 # Create entrypoint
+COPY docker/autoware-openadk/etc/dev_entrypoint.sh /dev_entrypoint.sh
+RUN chmod +x /dev_entrypoint.sh
+ENTRYPOINT ["/dev_entrypoint.sh"]
 CMD ["/bin/bash"]
 
 FROM devel as prebuilt
@@ -85,7 +93,7 @@ RUN source /opt/ros/"$ROS_DISTRO"/setup.bash \
 # Create entrypoint
 CMD ["/bin/bash"]
 
-FROM base as monolithic
+FROM base as monorun
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ARG LIB_DIR

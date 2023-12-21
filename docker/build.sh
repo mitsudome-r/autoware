@@ -84,6 +84,6 @@ docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/autoware-openadk/dock
     --set "base.tags=ghcr.io/autowarefoundation/autoware-openadk:base-$rosdistro-latest$image_name_suffix" \
     --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadk:devel-$rosdistro-latest$image_name_suffix" \
     --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadk:prebuilt-$rosdistro-latest$image_name_suffix" \
-    --set "monolithic.tags=ghcr.io/autowarefoundation/autoware-openadk:monolithic-$rosdistro-latest$image_name_suffix" \
+    --set "monorun.tags=ghcr.io/autowarefoundation/autoware-openadk:monorun-$rosdistro-latest$image_name_suffix" \
     "${targets[@]}"
 set +x

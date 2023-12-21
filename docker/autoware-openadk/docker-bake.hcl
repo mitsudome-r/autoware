@@ -1,12 +1,12 @@
 group "default" {
-  targets = ["base", "devel", "prebuilt", "monolithic"]
+  targets = ["base", "devel", "prebuilt", "monorun"]
 }
 
 // For docker/metadata-action
 target "docker-metadata-action-base" {}
 target "docker-metadata-action-devel" {}
 target "docker-metadata-action-prebuilt" {}
-target "docker-metadata-action-monolithic" {}
+target "docker-metadata-action-monorun" {}
 
 target "base" {
   inherits = ["docker-metadata-action-base"]
@@ -26,8 +26,13 @@ target "prebuilt" {
   target = "prebuilt"
 }
 
-target "monolithic" {
-  inherits = ["docker-metadata-action-monolithic"]
+target "monorun" {
+  inherits = ["docker-metadata-action-monorun"]
   dockerfile = "docker/autoware-openadk/Dockerfile"
+<<<<<<< HEAD
   target = "monolithic"
 }
+=======
+  target = "monorun"
+}
+>>>>>>> 5f13c741 (change monolithic to monorun, update readme and run.sh)

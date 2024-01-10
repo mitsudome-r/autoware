@@ -1,10 +1,9 @@
 # Open AD Kit: Containerized Workloads for the Autoware
 
-We have three types of Docker image: `development`, `prebuilt` and `monorun`.
+Open AD Kit offers two types of Docker image to let you get started with the Autoware quickly: `development` and `monorun`.
 
 1. The `development` image enables you to develop Autoware without setting up the local development environment.
-2. The `prebuilt` image contains prebuilt binaries on top of development environment
-3. The `monorun` image contains executables and enables you to try out Autoware quickly.
+2. The `monorun` image contains only runtime executables and enables you to try out Autoware quickly.
 
 **Note**: Before proceeding, confirm and agree with the [NVIDIA Deep Learning Container license](https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license). By pulling and using the Autoware Universe images, you accept the terms and conditions of the license.
 
@@ -43,12 +42,12 @@ For more launch options you can edit the launch command `--launch-cmd`:
 ./docker/run.sh --map-path path_to_map_data --launch-cmd "ros2 launch autoware_launch autoware.launch.xml map_path:=/autoware_map vehicle_model:=sample_vehicle sensor_model:=sample_sensor_kit"
 ```
 
-### Development
+### Using Development Container
 
 ```bash
 ./docker/run.sh --devel
 ```
-**Note**: By default workspace mounted on the container will be current directory, you chance workspace path by `--workspace path_to_workspace`. For development environments without NVIDIA GPU support use `--no-nvidia`.
+**Note**: By default workspace mounted on the container will be current directory, you can change the workspace path by `--workspace path_to_workspace`. For development environments without NVIDIA GPU support use `--no-nvidia`.
 
 #### Using VS Code Remote Containers for Development
 

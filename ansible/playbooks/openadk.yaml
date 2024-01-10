@@ -22,23 +22,25 @@
       when: module == 'base'
     - role: autoware.dev_env.gdown
       when: module == 'base'
+    - role: autoware.dev_env.kisak_mesa
+      when: module == 'base'
 
     # Module specific dependencies
     - role: autoware.dev_env.geographiclib
       when: module == 'perception-localization' or module == 'all'
     - role: autoware.dev_env.cuda
-      when: module == 'perception-localization' or module == 'all' and prompt_install_nvidia=='y'
+      when: (module == 'perception-localization' or module == 'all') and prompt_install_nvidia=='y'
     - role: autoware.dev_env.tensorrt
-      when: module == 'perception-localization' or module == 'all' and prompt_install_nvidia=='y'
+      when: (module == 'perception-localization' or module == 'all') and prompt_install_nvidia=='y'
     - role: autoware.dev_env.pacmod
       when: module == 'planning-control' or module == 'perception-localization' or module == 'all'
+    
+    # ONNX files and other artifacts
+    - role: autoware.dev_env.artifacts
+      when: (module == 'perception-localization' or module == 'all') and prompt_install_nvidia=='y'
     
     # Development environment
     - role: autoware.dev_env.devel
       when: install_devel == 'true'
     - role: autoware.dev_env.ros2_dev_tools
       when: install_devel == 'true'
-
-    # ONNX files and other artifacts
-    # - role: autoware.dev_env.artifacts
-    #   when: install_devel == 'false'

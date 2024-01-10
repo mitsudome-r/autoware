@@ -51,18 +51,6 @@ runs:
         echo "$EOF" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Docker meta for base
-      id: meta-base
-      uses: docker/metadata-action@v4
-      with:
-        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
-        tags: ${{ steps.set-docker-tags.outputs.tags }}
-        bake-target: docker-metadata-action-base
-        flavor: |
-          latest=false
-          prefix=${{ inputs.tag-prefix }}
-          suffix=${{ inputs.tag-suffix }}
-
     - name: Docker meta for devel
       id: meta-devel
       uses: docker/metadata-action@v4
@@ -74,18 +62,6 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=${{ inputs.tag-suffix }}
-
-    - name: Docker meta for prebuilt
-      id: meta-prebuilt
-      uses: docker/metadata-action@v4
-      with:
-        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
-        tags: ${{ steps.set-docker-tags.outputs.tags }}
-        bake-target: docker-metadata-action-prebuilt
-        flavor: |
-          latest=false
-          prefix=${{ inputs.tag-prefix }}
-          suffix=-prebuilt${{ inputs.tag-suffix }}
     
     - name: Docker meta for monorun
       id: meta-monorun
@@ -114,9 +90,7 @@ runs:
         push: ${{ github.event_name == 'schedule' || github.ref_name == github.event.repository.default_branch || github.event_name == 'push'}}
         files: |
           docker/${{ inputs.bake-target }}/docker-bake.hcl
-          ${{ steps.meta-base.outputs.bake-file }}
           ${{ steps.meta-devel.outputs.bake-file }}
-          ${{ steps.meta-prebuilt.outputs.bake-file }}
           ${{ steps.meta-monorun.outputs.bake-file }}
         provenance: false
         set: |

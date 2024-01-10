@@ -1,23 +1,21 @@
 #!/bin/bash
 
+# Get the user ID and group ID of the local user
 USER_ID=${LOCAL_UID}
+USER_NAME=${LOCAL_USER}
 GROUP_ID=${LOCAL_GID}
-
-# Extract username from /etc/passwd based on the passed UID
-USER_NAME=$(getent passwd "$USER_ID" | cut -d: -f1)
-
-if [ -z "$USER_NAME" ]; then
-    echo "User with UID $USER_ID not found in /etc/passwd."
-    exit 1
-fi
-
+GROUP_NAME=${LOCAL_GROUP}
 echo "Starting with user: $USER_NAME >> UID $USER_ID, GID: $GROUP_ID"
+
+# Create group and user with GID/UID
+groupadd -g $GROUP_ID  $GROUP_NAME
 useradd -u $USER_ID -g $GROUP_ID -s /bin/bash -m -d /home/$USER_NAME $USER_NAME
 
-chown -R $USER_NAME:$USER_NAME /home/$USER_NAME
+# Add sudo privileges to the user
+echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-export HOME=/home/$USER_NAME
-
-exec /usr/sbin/gosu $USER_NAME "$@"
-
+# Source ROS2
 source /opt/ros/humble/setup.bash
+
+# Execute the command as the user
+exec /usr/sbin/gosu $USER_NAME "$@"

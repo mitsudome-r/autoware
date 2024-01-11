@@ -12,7 +12,7 @@
 - name: Install Mesa libraries
   become: true
   ansible.builtin.apt:
-    name: 
+    name:
       - libegl-mesa0
       - libegl1-mesa-dev
       - libgbm-dev

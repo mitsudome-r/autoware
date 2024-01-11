@@ -107,8 +107,8 @@ main() {
 
     # Launch Autoware with custom map
     docker run -it --rm --net=host ${GPU_FLAG} ${USER_ID} ${MOUNT_X} \
-    ${WORKSPACE} ${MAP} ${IMAGE} \
-    ${LAUNCH_CMD}
+        ${WORKSPACE} ${MAP} ${IMAGE} \
+        ${LAUNCH_CMD}
 }
 
 # Execute the main script

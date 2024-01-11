@@ -79,7 +79,7 @@
     state: present
     create: true
     mode: 0644
-  
+
 - name: Create Vulkan directory
   become: true
   ansible.builtin.file:
@@ -133,7 +133,7 @@
     path: "/etc/OpenCL/vendors/nvidia.icd"
     state: "touch"
     mode: "0644"
-    
+
 - name: Set permissions for OpenCL GPU vendors
   become: true
   ansible.builtin.lineinfile:

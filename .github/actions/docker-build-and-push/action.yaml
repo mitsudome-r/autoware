@@ -62,7 +62,7 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=${{ inputs.tag-suffix }}
-    
+
     - name: Docker meta for monorun
       id: meta-monorun
       uses: docker/metadata-action@v4

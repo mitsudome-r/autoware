@@ -8,11 +8,11 @@ GROUP_NAME=${LOCAL_GROUP}
 echo "Starting with user: $USER_NAME >> UID $USER_ID, GID: $GROUP_ID"
 
 # Create group and user with GID/UID
-groupadd -g $GROUP_ID  $GROUP_NAME
+groupadd -g $GROUP_ID $GROUP_NAME
 useradd -u $USER_ID -g $GROUP_ID -s /bin/bash -m -d /home/$USER_NAME $USER_NAME
 
 # Add sudo privileges to the user
-echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >>/etc/sudoers
 
 # Source ROS2
 source /opt/ros/humble/setup.bash

@@ -34,6 +34,7 @@ You can use `run.sh` to run the Autoware runtime container with the map data:
 ```bash
 ./docker/run.sh --map-path path_to_map_data
 ```
+
 **Note**: You can use `--no-nvidia` to run without NVIDIA GPU support, and `--headless` to run without display that means no RViz visualization.
 
 For more launch options you can edit the launch command `--launch-cmd`:
@@ -47,6 +48,7 @@ For more launch options you can edit the launch command `--launch-cmd`:
 ```bash
 ./docker/run.sh --devel
 ```
+
 **Note**: By default workspace mounted on the container will be current directory, you can change the workspace path by `--workspace path_to_workspace`. For development environments without NVIDIA GPU support use `--no-nvidia`.
 
 #### Using VS Code Remote Containers for Development
@@ -54,35 +56,35 @@ For more launch options you can edit the launch command `--launch-cmd`:
 Get the Visual Studio Code's [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 Refer to [this document](https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user) for more details.
 
-   ```json
-   // .devcontainer/devcontainer.json
-   {
-     "name": "Autoware",
-     "build": {
-       "dockerfile": "Dockerfile"
-     },
-     "remoteUser": "autoware",
-     "settings": {
-       "terminal.integrated.defaultProfile.linux": "bash"
-     }
-   }
-   ```
+```json
+// .devcontainer/devcontainer.json
+{
+  "name": "Autoware",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "autoware",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  }
+}
+```
 
-   ```docker
-   # .devcontainer/Dockerfile
-   FROM ghcr.io/autowarefoundation/autoware-universe:latest
+```docker
+# .devcontainer/Dockerfile
+FROM ghcr.io/autowarefoundation/autoware-universe:latest
 
-   ARG USERNAME=autoware
-   ARG USER_UID=1000
-   ARG USER_GID=$USER_UID
+ARG USERNAME=autoware
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
 
-   RUN groupadd --gid $USER_GID $USERNAME \
-     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-     && apt-get update \
-     && apt-get install -y sudo \
-     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-     && chmod 0440 /etc/sudoers.d/$USERNAME
-   ```
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+  && apt-get update \
+  && apt-get install -y sudo \
+  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+  && chmod 0440 /etc/sudoers.d/$USERNAME
+```
 
 ## Building Docker images from scratch
 

@@ -16,35 +16,35 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Combine multi arch images for 'autoware-universe'
+      - name: Combine multi arch images for 'autoware-openadk'
         uses: ./.github/actions/combine-multi-arch-images
         with:
-          package-name: autoware-universe
+          package-name: autoware-openadk
 
-      - name: Create alias from 'autoware-universe:{rosdistro}-latest' to 'autoware-universe:latest'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest' to 'autoware-openadk:latest'
         uses: ./.github/actions/create-main-distro-alias
         with:
-          package-name: autoware-universe
+          package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
           tag-name: latest
 
-      - name: Create alias from 'autoware-universe:{rosdistro}-latest-prebuilt' to 'autoware-universe:latest-prebuilt'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-monorun' to 'autoware-openadk:latest-monorun'
         uses: ./.github/actions/create-main-distro-alias
         with:
-          package-name: autoware-universe
+          package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
-          tag-name: latest-prebuilt
+          tag-name: latest-monorun
 
-      - name: Create alias from 'autoware-universe:{rosdistro}-latest-cuda' to 'autoware-universe:latest-cuda'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-cuda' to 'autoware-openadk:latest-cuda'
         uses: ./.github/actions/create-main-distro-alias
         with:
-          package-name: autoware-universe
+          package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
           tag-name: latest-cuda
 
-      - name: Create alias from 'autoware-universe:{rosdistro}-latest-prebuilt-cuda' to 'autoware-universe:latest-prebuilt-cuda'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-monorun-cuda' to 'autoware-openadk:latest-monorun-cuda'
         uses: ./.github/actions/create-main-distro-alias
         with:
-          package-name: autoware-universe
+          package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
-          tag-name: latest-prebuilt-cuda
+          tag-name: latest-monorun-cuda

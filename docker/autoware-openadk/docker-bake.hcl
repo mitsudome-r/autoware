@@ -15,10 +15,5 @@ target "devel" {
 target "monorun" {
   inherits = ["docker-metadata-action-monorun"]
   dockerfile = "docker/autoware-openadk/Dockerfile"
-<<<<<<< HEAD
-  target = "monolithic"
-}
-=======
   target = "monorun"
 }
->>>>>>> 5f13c741 (change monolithic to monorun, update readme and run.sh)

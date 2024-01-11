@@ -1,4 +1,4 @@
-# autoware_core
+# devel
 
 This role installs development dependencies for Autoware.
 

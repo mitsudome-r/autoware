@@ -20,7 +20,7 @@
       - nvidia-container-toolkit
     update_cache: true
 
-- name: Add NVIDIA container toolkit repository
+- name: Add NVIDIA runtime support to docker engine
   ansible.builtin.shell: |
     sudo nvidia-ctk runtime configure --runtime=docker
 

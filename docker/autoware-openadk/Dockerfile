@@ -124,7 +124,7 @@ RUN --mount=type=ssh \
   && find / -name "*.h" -type f -delete \
   && find / -name "*.hpp" -type f -delete \
   && rm -rf /autoware/src /autoware/ansible /autoware/autoware.repos \
-    /root/.local/pipx /opt/ros/humble/include /etc/apt/sources.list.d/cuda*.list \
+    /root/.local/pipx /opt/ros/"$ROS_DISTRO"/include /etc/apt/sources.list.d/cuda*.list \
     /etc/apt/sources.list.d/docker.list /etc/apt/sources.list.d/nvidia-docker.list \
     /usr/include /usr/share/doc /usr/lib/gcc /usr/lib/jvm /usr/lib/llvm*
 

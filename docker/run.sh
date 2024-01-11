@@ -2,6 +2,13 @@
 
 set -e
 
+SCRIPT_DIR=$(readlink -f "$(dirname "$0")")
+WORKSPACE_ROOT="$SCRIPT_DIR/../"
+source "$WORKSPACE_ROOT/amd64.env"
+if [ "$(uname -m)" = "aarch64" ]; then
+    source "$WORKSPACE_ROOT/arm64.env"
+fi
+
 # Function to print help message
 print_help() {
     echo "Usage: run.sh [OPTIONS]"
@@ -64,7 +71,7 @@ parse_arguments() {
 # Set image and workspace variables based on options
 set_variables() {
     if [ "$option_devel" == "true" ]; then
-        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:devel-humble-latest"
+        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:devel-$rosdistro-latest"
         USER_ID="-e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -e LOCAL_USER=$(id -un) -e LOCAL_GROUP=$(id -gn)"
         WORKSPACE="-v ${WORKSPACE_PATH}:/workspace"
         LAUNCH_CMD=""
@@ -74,7 +81,7 @@ set_variables() {
             exit 1
         fi
         MAP="-v ${MAP_PATH}:/${MAP_PATH}"
-        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:latest-monorun-humble"
+        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:monorun-$rosdistro-latest"
         WORKSPACE=""
     fi
 }

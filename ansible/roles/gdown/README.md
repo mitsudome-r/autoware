@@ -1,6 +1,6 @@
-# autoware_core
+# Role: gdown
 
-This role installs development/runtime dependencies for Autoware Core.
+This role installs gdown to download files from CMakeLists.txt.
 
 ## Inputs
 

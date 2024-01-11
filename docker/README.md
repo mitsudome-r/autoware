@@ -1,11 +1,11 @@
 # Open AD Kit: Containerized Workloads for the Autoware
 
-Open AD Kit offers two types of Docker image to let you get started with the Autoware quickly: `development` and `monorun`.
+Open AD Kit offers two types of Docker image to let you get started with the Autoware quickly: `devel` and `monorun`.
 
-1. The `development` image enables you to develop Autoware without setting up the local development environment.
+1. The `devel` image enables you to develop Autoware without setting up the local development environment.
 2. The `monorun` image contains only runtime executables and enables you to try out Autoware quickly.
 
-**Note**: Before proceeding, confirm and agree with the [NVIDIA Deep Learning Container license](https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license). By pulling and using the Autoware Universe images, you accept the terms and conditions of the license.
+**Note**: Before proceeding, confirm and agree with the [NVIDIA Deep Learning Container license](https://developer.nvidia.com/ngc/nvidia-deep-learning-container-license). By pulling and using the Autoware Open AD Kit images, you accept the terms and conditions of the license.
 
 ## Prerequisites
 
@@ -55,36 +55,6 @@ For more launch options you can edit the launch command `--launch-cmd`:
 
 Get the Visual Studio Code's [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 Refer to [this document](https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user) for more details.
-
-```json
-// .devcontainer/devcontainer.json
-{
-  "name": "Autoware",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
-  "remoteUser": "autoware",
-  "settings": {
-    "terminal.integrated.defaultProfile.linux": "bash"
-  }
-}
-```
-
-```docker
-# .devcontainer/Dockerfile
-FROM ghcr.io/autowarefoundation/autoware-universe:latest
-
-ARG USERNAME=autoware
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-
-RUN groupadd --gid $USER_GID $USERNAME \
-  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
-  && apt-get update \
-  && apt-get install -y sudo \
-  && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-  && chmod 0440 /etc/sudoers.d/$USERNAME
-```
 
 ## Building Docker images from scratch
 

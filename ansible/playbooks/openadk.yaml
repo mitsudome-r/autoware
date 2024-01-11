@@ -37,8 +37,8 @@
 
     # ONNX files and other artifacts
     - role: autoware.dev_env.artifacts
-      when: (module == 'perception-localization' or module == 'all') and prompt_install_nvidia=='y'
-
+      when: module == 'perception-localization' or module == 'all'
+    
     # Development environment
     - role: autoware.dev_env.devel
       when: install_devel == 'true'

@@ -1,0 +1,6 @@
+{
+	"name": "Autoware",
+	"image": "ghcr.io/autowarefoundation/autoware-openadk:devel-latest"
+
+	// "remoteUser": "autoware",
+}

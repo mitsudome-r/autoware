@@ -99,10 +99,10 @@ To build without CUDA, use the `--no-cuda` option:
 ./docker/build.sh --no-cuda
 ```
 
-To build only development image, use the `--no-prebuilt` option:
+To build only development image, use the `--devel-only` option:
 
 ```bash
-./docker/build.sh --no-prebuilt
+./docker/build.sh --devel-only
 ```
 
 To specify the platform, use the `--platform` option:

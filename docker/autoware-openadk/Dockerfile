@@ -85,6 +85,7 @@ ARG ROS_DISTRO
 WORKDIR /autoware
 
 # Build and change permission for runtime data conversion
+COPY autoware.repos /autoware/
 RUN --mount=type=ssh \
   mkdir src \
   && vcs import src < autoware.repos \

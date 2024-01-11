@@ -10,7 +10,7 @@ print_help() {
     echo "  -h              Display this help message"
     echo "  --no-cuda       Disable CUDA support"
     echo "  --platform      Specify the platform (default: current platform)"
-    echo "  --no-prebuilt   Build devel image only"
+    echo "  --devel-only    Build devel image only"
     echo ""
     echo "Note: The --platform option should be one of 'linux/amd64' or 'linux/arm64'."
 }
@@ -33,8 +33,8 @@ parse_arguments() {
             option_platform="$2"
             shift
             ;;
-        --no-prebuilt)
-            option_no_prebuilt=true
+        --devel-only)
+            option_devel_only=true
             ;;
         esac
         shift
@@ -51,9 +51,9 @@ set_cuda_options() {
     fi
 }
 
-# Set prebuilt options
-set_prebuilt_options() {
-    if [ "$option_no_prebuilt" = "true" ]; then
+# Set build options
+set_build_options() {
+    if [ "$option_devel_only" = "true" ]; then
         targets=("devel")
     else
         targets=()
@@ -123,7 +123,7 @@ build_images() {
 # Main script execution
 parse_arguments "$@"
 set_cuda_options
-set_prebuilt_options
+set_build_options
 set_platform
 set_arch_lib_dir
 load_env

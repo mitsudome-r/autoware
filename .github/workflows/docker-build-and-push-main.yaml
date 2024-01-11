@@ -50,7 +50,6 @@ jobs:
             *.platform=linux/amd64
             *.args.ROS_DISTRO=${{ env.rosdistro }}
             *.args.BASE_IMAGE=${{ env[format('{0}', matrix.base_image_env)] }}
-            *.args.PREBUILT_BASE_IMAGE=${{ env.prebuilt_base_image }}
             *.args.SETUP_ARGS=${{ matrix.setup-args }}
             *.args.LIB_DIR=${{ matrix.lib_dir }}
           tag-prefix: ${{ env.rosdistro }}-

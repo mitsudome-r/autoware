@@ -62,7 +62,7 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=devel${{ inputs.tag-suffix }}
-    
+
     - name: Docker meta for prebuilt
       id: meta-prebuilt
       uses: docker/metadata-action@v4

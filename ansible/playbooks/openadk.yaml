@@ -5,7 +5,7 @@
     - name: Verify OS
       ansible.builtin.fail:
         msg: Only Ubuntu 22.04 is supported for this branch. Please refer to https://autowarefoundation.github.io/autoware-documentation/main/installation/autoware/source-installation/.
-      when: ansible_distribution_version != '22.04'
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version != '22.04'
 
     - name: Print args
       ansible.builtin.debug:
@@ -34,13 +34,13 @@
       when: (module == 'perception-localization' or module == 'all') and prompt_install_nvidia=='y'
     - role: autoware.dev_env.pacmod
       when: module == 'planning-control' or module == 'perception-localization' or module == 'all'
-
-    # ONNX files and other artifacts
-    - role: autoware.dev_env.artifacts
-      when: module == 'perception-localization' or module == 'all'
-
+    
     # Development environment
     - role: autoware.dev_env.devel
-      when: install_devel == 'true'
+      when: module == 'dev-tools' 
     - role: autoware.dev_env.ros2_dev_tools
-      when: install_devel == 'true'
+      when: module == 'dev-tools' 
+    
+    # ONNX files and other artifacts
+    - role: autoware.dev_env.artifacts
+      when: module == 'dev-tools' or (module == 'all' and install_devel == 'false')

@@ -36,6 +36,11 @@ parse_arguments() {
         --devel-only)
             option_devel_only=true
             ;;
+        *)
+            echo "Unknown option: $1"
+            print_help
+            exit 1
+            ;;
         esac
         shift
     done
@@ -115,7 +120,8 @@ build_images() {
         --set "*.args.SETUP_ARGS=$setup_args" \
         --set "*.args.LIB_DIR=$lib_dir" \
         --set "devel.tags=ghcr.io/autowarefoundation/autoware-openadk:devel-$rosdistro-latest$image_name_suffix" \
-        --set "monorun.tags=ghcr.io/autowarefoundation/autoware-openadk:monorun-$rosdistro-latest$image_name_suffix" \
+        --set "prebuilt.tags=ghcr.io/autowarefoundation/autoware-openadk:prebuilt-$rosdistro-latest$image_name_suffix" \
+        --set "runtime.tags=ghcr.io/autowarefoundation/autoware-openadk:runtime-$rosdistro-latest$image_name_suffix" \
         "${targets[@]}"
     set +x
 }

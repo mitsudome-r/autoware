@@ -28,12 +28,12 @@ jobs:
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
           tag-name: latest
 
-      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-monorun' to 'autoware-openadk:latest-monorun'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-runtime' to 'autoware-openadk:latest-runtime'
         uses: ./.github/actions/create-main-distro-alias
         with:
           package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
-          tag-name: latest-monorun
+          tag-name: latest-runtime
 
       - name: Create alias from 'autoware-openadk:{rosdistro}-latest-cuda' to 'autoware-openadk:latest-cuda'
         uses: ./.github/actions/create-main-distro-alias
@@ -42,9 +42,9 @@ jobs:
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
           tag-name: latest-cuda
 
-      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-monorun-cuda' to 'autoware-openadk:latest-monorun-cuda'
+      - name: Create alias from 'autoware-openadk:{rosdistro}-latest-runtime-cuda' to 'autoware-openadk:latest-runtime-cuda'
         uses: ./.github/actions/create-main-distro-alias
         with:
           package-name: autoware-openadk
           rosdistro: ${{ needs.load-env.outputs.rosdistro }}
-          tag-name: latest-monorun-cuda
+          tag-name: latest-runtime-cuda

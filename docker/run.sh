@@ -63,6 +63,11 @@ parse_arguments() {
             LAUNCH_CMD="$2"
             shift
             ;;
+        *)
+            echo "Unknown option: $1"
+            print_help
+            exit 1
+            ;;
         esac
         shift
     done
@@ -81,7 +86,7 @@ set_variables() {
             exit 1
         fi
         MAP="-v ${MAP_PATH}:/${MAP_PATH}"
-        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:monorun-$rosdistro-latest"
+        IMAGE="ghcr.io/autowarefoundation/autoware-openadk:runtime-$rosdistro-latest"
         WORKSPACE=""
     fi
 }

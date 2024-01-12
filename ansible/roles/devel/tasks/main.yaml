@@ -1,11 +1,3 @@
-- name: Install ccache
-  become: true
-  ansible.builtin.apt:
-    name:
-      - ccache
-    state: latest
-    update_cache: true
-
 # https://github.com/git-lfs/git-lfs/wiki/Installation#debian-and-ubuntu
 - name: Install Git LFS
   become: true

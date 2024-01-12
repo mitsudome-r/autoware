@@ -1,10 +1,11 @@
 group "default" {
-  targets = ["devel", "monorun"]
+  targets = ["prebuilt", "devel", "runtime"]
 }
 
 // For docker/metadata-action
 target "docker-metadata-action-devel" {}
-target "docker-metadata-action-monorun" {}
+target "docker-metadata-action-prebuilt" {}
+target "docker-metadata-action-runtime" {}
 
 target "devel" {
   inherits = ["docker-metadata-action-devel"]
@@ -12,8 +13,14 @@ target "devel" {
   target = "devel"
 }
 
-target "monorun" {
-  inherits = ["docker-metadata-action-monorun"]
+target "prebuilt" {
+  inherits = ["docker-metadata-action-prebuilt"]
   dockerfile = "docker/autoware-openadk/Dockerfile"
-  target = "monorun"
+  target = "prebuilt"
+}
+
+target "runtime" {
+  inherits = ["docker-metadata-action-runtime"]
+  dockerfile = "docker/autoware-openadk/Dockerfile"
+  target = "runtime"
 }

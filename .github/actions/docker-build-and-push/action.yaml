@@ -61,19 +61,31 @@ runs:
         flavor: |
           latest=false
           prefix=${{ inputs.tag-prefix }}
-          suffix=${{ inputs.tag-suffix }}
-
-    - name: Docker meta for monorun
-      id: meta-monorun
+          suffix=devel${{ inputs.tag-suffix }}
+    
+    - name: Docker meta for prebuilt
+      id: meta-prebuilt
       uses: docker/metadata-action@v4
       with:
         images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
         tags: ${{ steps.set-docker-tags.outputs.tags }}
-        bake-target: docker-metadata-action-monorun
+        bake-target: docker-metadata-action-prebuilt
         flavor: |
           latest=false
           prefix=${{ inputs.tag-prefix }}
-          suffix=-monorun${{ inputs.tag-suffix }}
+          suffix=prebuilt${{ inputs.tag-suffix }}
+
+    - name: Docker meta for runtime
+      id: meta-runtime
+      uses: docker/metadata-action@v4
+      with:
+        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
+        tags: ${{ steps.set-docker-tags.outputs.tags }}
+        bake-target: docker-metadata-action-runtime
+        flavor: |
+          latest=false
+          prefix=${{ inputs.tag-prefix }}
+          suffix=-runtime${{ inputs.tag-suffix }}
 
     - name: Login to GitHub Container Registry
       if: ${{ github.event_name != 'pull_request' }}
@@ -91,7 +103,8 @@ runs:
         files: |
           docker/${{ inputs.bake-target }}/docker-bake.hcl
           ${{ steps.meta-devel.outputs.bake-file }}
-          ${{ steps.meta-monorun.outputs.bake-file }}
+          ${{ steps.meta-prebuilt.outputs.bake-file }}
+          ${{ steps.meta-runtime.outputs.bake-file }}
         provenance: false
         set: |
           ${{ inputs.build-args }}

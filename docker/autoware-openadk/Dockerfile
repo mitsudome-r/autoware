@@ -11,6 +11,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y install --no-ins
   wget \
   cmake \
   curl \
+  ccache \
   gnupg \
   vim \
   unzip \
@@ -38,10 +39,13 @@ RUN --mount=type=ssh \
 # Create entrypoint
 CMD ["/bin/bash"]
 
-FROM base as devel
+FROM base as prebuilt
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ARG SETUP_ARGS
+ENV CMAKE_GENERATOR=Ninja
+ENV CCACHE_DIR=/ccache
+ARG ROS_DISTRO
 
 # Set up development environment
 RUN --mount=type=ssh \
@@ -61,8 +65,28 @@ RUN --mount=type=ssh \
   && apt update \
   && rosdep update \
   && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
+  && source /opt/ros/"$ROS_DISTRO"/setup.bash \
+  && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --cmake-args \
+    " -Wno-dev" \
+    " --no-warn-unused-cli" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+  && find /autoware/install -type d -exec chmod 777 {} \; \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache \
-  && rm -rf /autoware
+  && rm -rf /autoware/build /autoware/src
+
+CMD ["/bin/bash"]
+
+FROM prebuilt as devel
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install development tools and artifacts
+RUN --mount=type=ssh \
+  ./setup-dev-env.sh -y --module dev-tools openadk \
+  && pip uninstall -y ansible ansible-core \
+  && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache
 
 # Instal gosu for switching to local user in entrypoint
 RUN --mount=type=ssh \
@@ -78,32 +102,7 @@ RUN chmod +x /dev_entrypoint.sh
 ENTRYPOINT ["/dev_entrypoint.sh"]
 CMD ["/bin/bash"]
 
-FROM devel as prebuilt
-ENV CMAKE_GENERATOR=Ninja
-ENV CCACHE_DIR=/ccache
-ARG ROS_DISTRO
-WORKDIR /autoware
-
-# Build and change permission for runtime data conversion
-COPY autoware.repos /autoware/
-RUN --mount=type=ssh \
-  mkdir src \
-  && vcs import src < autoware.repos \
-  && source /opt/ros/"$ROS_DISTRO"/setup.bash \
-  && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release --cmake-args \
-    " -Wno-dev" \
-    " --no-warn-unused-cli" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-  && find /autoware/install -type d -exec chmod 777 {} \; \
-  && echo "source /autoware/install/setup.bash" > /etc/bash.bashrc \
-  && rm -rf /autoware/src /autoware/build
-
-CMD ["/bin/bash"]
-
-FROM base as monorun
+FROM base as runtime
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ARG LIB_DIR
@@ -117,7 +116,7 @@ RUN --mount=type=ssh \
   && mkdir src \
   && vcs import src < autoware.repos \
   && rosdep update \
-  && DEBIAN_FRONTEND=noninteractive rosdep install -y --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
+  && DEBIAN_FRONTEND=noninteractive rosdep install -y --dependency-types=exec --ignore-src --from-paths src --rosdistro "$ROS_DISTRO" \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache \
   && find /usr/lib/$LIB_DIR-linux-gnu -name "*.a" -type f -delete \
   && find / -name "*.o" -type f -delete \

@@ -51,18 +51,6 @@ runs:
         echo "$EOF" >> $GITHUB_OUTPUT
       shell: bash
 
-    - name: Docker meta for devel
-      id: meta-devel
-      uses: docker/metadata-action@v4
-      with:
-        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
-        tags: ${{ steps.set-docker-tags.outputs.tags }}
-        bake-target: docker-metadata-action-devel
-        flavor: |
-          latest=false
-          prefix=${{ inputs.tag-prefix }}
-          suffix=devel${{ inputs.tag-suffix }}
-
     - name: Docker meta for prebuilt
       id: meta-prebuilt
       uses: docker/metadata-action@v4
@@ -74,6 +62,18 @@ runs:
           latest=false
           prefix=${{ inputs.tag-prefix }}
           suffix=prebuilt${{ inputs.tag-suffix }}
+
+    - name: Docker meta for devel
+      id: meta-devel
+      uses: docker/metadata-action@v4
+      with:
+        images: ghcr.io/${{ github.repository_owner }}/${{ inputs.bake-target }}
+        tags: ${{ steps.set-docker-tags.outputs.tags }}
+        bake-target: docker-metadata-action-devel
+        flavor: |
+          latest=false
+          prefix=${{ inputs.tag-prefix }}
+          suffix=devel${{ inputs.tag-suffix }}
 
     - name: Docker meta for runtime
       id: meta-runtime

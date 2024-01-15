@@ -54,7 +54,19 @@ For more launch options you can edit the launch command `--launch-cmd`:
 #### Using VS Code Remote Containers for Development
 
 Get the Visual Studio Code's [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
-Refer to [this document](https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user) for more details.
+And reopen the workspace in the container by selecting `Remote-Containers: Reopen in Container` from the Command Palette (`F1`).
+
+By default devcontainer assumes NIVIDA GPU support, you can change this by deleting these lines within `.devcontainer/devcontainer.json`:
+
+```json
+    "hostRequirements": {
+      "gpu": true
+    },
+```
+```json
+      "--gpus", "all"
+```
+
 
 ## Building Docker images from scratch
 

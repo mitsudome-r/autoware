@@ -3,20 +3,20 @@ group "default" {
 }
 
 // For docker/metadata-action
-target "docker-metadata-action-devel" {}
 target "docker-metadata-action-prebuilt" {}
+target "docker-metadata-action-devel" {}
 target "docker-metadata-action-runtime" {}
-
-target "devel" {
-  inherits = ["docker-metadata-action-devel"]
-  dockerfile = "docker/autoware-openadk/Dockerfile"
-  target = "devel"
-}
 
 target "prebuilt" {
   inherits = ["docker-metadata-action-prebuilt"]
   dockerfile = "docker/autoware-openadk/Dockerfile"
   target = "prebuilt"
+}
+
+target "devel" {
+  inherits = ["docker-metadata-action-devel"]
+  dockerfile = "docker/autoware-openadk/Dockerfile"
+  target = "devel"
 }
 
 target "runtime" {

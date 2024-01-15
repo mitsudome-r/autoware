@@ -15,12 +15,12 @@ print_help() {
     echo "Options:"
     echo "  --help          Display this help message"
     echo "  -h              Display this help message"
+    echo "  --map-path      Specify the path to the map files (mandatory)"
     echo "  --no-nvidia     Disable NVIDIA GPU support"
     echo "  --devel         Use the latest development version of Autoware"
-    echo "  --headless      Run Autoware in headless mode"
+    echo "  --headless      Run Autoware in headless mode (default: false)"
     echo "  --workspace     Specify the workspace path (default: current directory)"
-    echo "  --map-path      Specify the path to the map files (mandatory)"
-    echo "  --launch-cmd    Specify the launch command (default: autoware.launch.xml)"
+    echo "  --launch-cmd    Specify the launch command for the container"
     echo ""
     echo "Note: The --map-path option is mandatory. Please provide the path to the map files."
 }
@@ -29,8 +29,8 @@ print_help() {
 option_no_nvidia=false
 option_devel=false
 option_headless=false
-MAP_PATH="/path/to/map"
-LAUNCH_CMD="ros2 launch autoware_launch autoware.launch.xml map_path:=${MAP_PATH} vehicle_model:=sample_vehicle sensor_model:=sample_sensor_kit"
+MAP_PATH=""
+LAUNCH_CMD=""
 WORKSPACE_PATH="${PWD}"
 USER_ID=""
 
@@ -80,14 +80,28 @@ set_variables() {
         USER_ID="-e LOCAL_UID=$(id -u) -e LOCAL_GID=$(id -g) -e LOCAL_USER=$(id -un) -e LOCAL_GROUP=$(id -gn)"
         WORKSPACE="-v ${WORKSPACE_PATH}:/workspace"
         LAUNCH_CMD=""
+
+        # Echo
+        echo -e "\nStarting Autoware devel container..."
+        echo "WORKSPACE: ${WORKSPACE_PATH}"
     else
         if [ "$MAP_PATH" == "" ]; then
             print_help
             exit 1
         fi
+        if [ "$LAUNCH_CMD" == "" ]; then
+            LAUNCH_CMD="ros2 launch autoware_launch autoware.launch.xml map_path:=${MAP_PATH} vehicle_model:=sample_vehicle sensor_model:=sample_sensor_kit"
+        fi
+
         MAP="-v ${MAP_PATH}:/${MAP_PATH}"
         IMAGE="ghcr.io/autowarefoundation/autoware-openadk:runtime-$rosdistro-latest"
         WORKSPACE=""
+
+        # Echo
+
+        echo -e "\nStarting Autoware..."
+        echo "MAP PATH: ${MAP_PATH}"
+        echo "LAUNCH CMD: ${LAUNCH_CMD}"
     fi
 }
 
@@ -118,6 +132,11 @@ main() {
     set_x_display
 
     # Launch Autoware with custom map
+    echo
+    echo "Executing Docker command:"
+    echo "docker run -it --rm --net=host ${GPU_FLAG} ${USER_ID} ${MOUNT_X} ${WORKSPACE} ${MAP} ${IMAGE} ${LAUNCH_CMD}"
+    echo "------------------------------------"
+    sleep 2
     docker run -it --rm --net=host ${GPU_FLAG} ${USER_ID} ${MOUNT_X} \
         ${WORKSPACE} ${MAP} ${IMAGE} \
         ${LAUNCH_CMD}

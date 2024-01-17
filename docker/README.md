@@ -63,10 +63,10 @@ By default devcontainer assumes NIVIDA GPU support, you can change this by delet
       "gpu": true
     },
 ```
+
 ```json
       "--gpus", "all"
 ```
-
 
 ## Building Docker images from scratch
 

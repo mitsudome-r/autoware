@@ -1,15 +1,18 @@
 # tasks file for nvidia-container-toolkit-installation
 - name: Add NVIDIA container toolkit GPG key
+  become: true
   ansible.builtin.shell: |
-    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
 - name: Add NVIDIA container toolkit repository
+  become: true
   ansible.builtin.shell: |
     curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
 - name: Update apt cache
+  become: true
   ansible.builtin.apt:
     update_cache: yes
 
@@ -21,9 +24,7 @@
     update_cache: true
 
 - name: Add NVIDIA runtime support to docker engine
+  become: true
   ansible.builtin.shell: |
-    sudo nvidia-ctk runtime configure --runtime=docker
+    nvidia-ctk runtime configure --runtime=docker
 
-- name: Restart docker engine for nvidia runtime support
-  ansible.builtin.shell: |
-    sudo systemctl restart docker

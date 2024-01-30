@@ -27,4 +27,3 @@
   become: true
   ansible.builtin.shell: |
     nvidia-ctk runtime configure --runtime=docker
-

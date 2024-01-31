@@ -10,7 +10,6 @@ jobs:
   setup-universe:
     needs: load-env
     runs-on: ubuntu-latest
-    container: ${{ needs.load-env.outputs.base-image }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

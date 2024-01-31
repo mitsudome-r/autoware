@@ -19,7 +19,7 @@ jobs:
 
       - name: Run setup script
         run: |
-          ./setup-dev-env.sh -y
+          ./setup-dev-env.sh -y --module all --no-cuda-drivers openadk
 
       - name: Set git config
         uses: autowarefoundation/autoware-github-actions/set-git-config@v1

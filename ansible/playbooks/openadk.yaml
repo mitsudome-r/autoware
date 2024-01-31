@@ -43,4 +43,4 @@
 
     # ONNX files and other artifacts
     - role: autoware.dev_env.artifacts
-      when: module == 'dev-tools' or (module == 'all' and install_devel == 'false')
+      when: prompt_download_artifacts == 'y'

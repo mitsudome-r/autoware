@@ -84,7 +84,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # Install development tools and artifacts
 RUN --mount=type=ssh \
-  ./setup-dev-env.sh -y --module dev-tools openadk \
+  ./setup-dev-env.sh -y --module dev-tools --download-artifacts openadk \
   && pip uninstall -y ansible ansible-core \
   && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* "$HOME"/.cache
 
@@ -108,10 +108,10 @@ ARG ROS_DISTRO
 ARG LIB_DIR
 ARG SETUP_ARGS
 
-# Set up runtime environment
+# Set up runtime environment and artifacts
 COPY autoware.repos /autoware/
 RUN --mount=type=ssh \
-  ./setup-dev-env.sh -y --module all ${SETUP_ARGS} --no-cuda-drivers --runtime openadk \
+  ./setup-dev-env.sh -y --module all ${SETUP_ARGS} --download-artifacts --no-cuda-drivers --runtime openadk \
   && pip uninstall -y ansible ansible-core \
   && mkdir src \
   && vcs import src < autoware.repos \

@@ -8,10 +8,10 @@
 - name: Add NVIDIA container toolkit repository
   become: true
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/ {{ ansible_distribution_release }} {{ ansible_architecture }}"
+    repo: deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list
     state: present
-    filename: nvidia-container-toolkit
-    update_cache: yes
+    filename: nvidia-container-toolkit.list
+    update_cache: true
 
 - name: Install NVIDIA Container Toolkit
   become: true

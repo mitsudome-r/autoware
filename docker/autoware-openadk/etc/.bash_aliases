@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # planning simulation
 function download_planning_map() {
     if [ ! -f ~/autoware_map/sample-map-planning.zip ]; then

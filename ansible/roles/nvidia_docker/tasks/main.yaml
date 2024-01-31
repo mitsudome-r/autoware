@@ -28,6 +28,7 @@
 
 - name: Restart docker daemon
   become: true
-  ansible.builtin.shell: |
-    systemctl restart docker
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
   changed_when: true

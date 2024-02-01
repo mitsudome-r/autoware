@@ -23,7 +23,7 @@ jobs:
             base_image_env: base_image
             lib_dir: aarch64
             setup-args: --no-nvidia
-            additional-tag-suffix: -debug
+            additional-tag-suffix: ""
           - name: cuda
             base_image_env: base_image
             lib_dir: aarch64

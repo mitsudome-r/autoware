@@ -20,6 +20,7 @@ else
     echo "$USER_NAME ALL=(ALL) NOPASSWD:ALL" >>/etc/sudoers
 
     # Source ROS2
+    # hadolint ignore=SC1090
     source "/opt/ros/$ROS_DISTRO/setup.bash"
 
     # Execute the command as the user

@@ -1,4 +1,4 @@
-FROM ghcr.io/autowarefoundation/openadk:devel-latest-cuda
+FROM ghcr.io/mitsudome-r/openadk:devel-latest-cuda
 
 ENV SHELL /bin/bash
 

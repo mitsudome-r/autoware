@@ -36,7 +36,7 @@
       when: module == 'planning-control' or module == 'perception-localization' or module == 'all'
 
     # Development environment
-    - role: autoware.dev_env.devel
+    - role: autoware.dev_env.dev_tools
       when: module == 'dev-tools'
     - role: autoware.dev_env.ros2_dev_tools
       when: module == 'dev-tools'

@@ -50,7 +50,7 @@
       when: prompt_install_nvidia == 'y'
 
     # Autoware devel dependencies
-    - role: autoware.dev_env.devel
+    - role: autoware.dev_env.dev_tools
       when: install_devel == 'true'
 
     # ONNX files and other artifacts

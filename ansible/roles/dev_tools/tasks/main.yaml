@@ -18,14 +18,6 @@
   when: "'filter.lfs.required' not in git_lfs__git_global_config.config_values"
   changed_when: true
 
-- name: Install plotjuggler
-  become: true
-  ansible.builtin.apt:
-    name:
-      - ros-{{ rosdistro }}-plotjuggler-ros
-    state: latest
-    update_cache: true
-
 - name: Install pre-commit
   ansible.builtin.pip:
     name: pre-commit

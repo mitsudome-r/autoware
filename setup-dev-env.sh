@@ -131,6 +131,8 @@ if [ "$target_playbook" = "autoware.dev_env.openadk" ]; then
     if [ "$option_download_artifacts" = "true" ]; then
         echo -e "\e[36mArtifacts will be downloaded to $option_data_dir\e[m"
         ansible_args+=("--extra-vars" "prompt_download_artifacts=y")
+    else
+        ansible_args+=("--extra-vars" "prompt_download_artifacts=N")
     fi
 elif [ "$option_yes" = "true" ] || [ "$option_download_artifacts" = "true" ]; then
     echo -e "\e[36mArtifacts will be downloaded to $option_data_dir\e[m"

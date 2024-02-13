@@ -8,6 +8,12 @@ on:
   schedule:
     - cron: 0 0 1,15 * *
   workflow_dispatch:
+    inputs:
+      publish_packages:
+        description: 'Publish packages to GitHub Package Registry'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   docker-build-and-push-main-self-hosted:

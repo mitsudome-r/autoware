@@ -78,7 +78,7 @@ runs:
         tags: ${{ steps.set-docker-tags.outputs.tags }}
         bake-target: docker-metadata-action-runtime
         flavor: |
-          latest: ${{ github.event_name == 'workflow_dispatch' && inputs.release_version != '' }}
+          latest=${{ github.event_name == 'workflow_dispatch' && inputs.release_version != '' }}
           suffix=-runtime${{ inputs.tag-suffix }}
 
     - name: Login to GitHub Container Registry

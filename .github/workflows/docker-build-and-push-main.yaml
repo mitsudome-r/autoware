@@ -1,10 +1,6 @@
 name: docker-build-and-push-main
 
 on:
-  push:
-    tags:
-      - v*
-      - "[0-9]+.[0-9]+*"
   schedule:
     - cron: 0 0 1,15 * *
   workflow_dispatch:
@@ -14,6 +10,11 @@ on:
         required: true
         default: false
         type: boolean
+      release_version:
+        description: 'Release version(If it is a release, specify the tag name for it)'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   docker-build-and-push-main:
@@ -33,7 +34,7 @@ jobs:
           - name: cuda
             base_image_env: base_image
             lib_dir: x86_64
-            additional-tag-suffix: -cuda-debug
+            additional-tag-suffix: -cuda
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

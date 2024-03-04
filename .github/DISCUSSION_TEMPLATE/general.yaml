@@ -1,0 +1,14 @@
+title: "[General] "
+body:
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      options:
+        - label: I have read the [Support Guidelines](https://autowarefoundation.github.io/autoware-documentation/main/support/support-guidelines/#github-discussions) for GitHub Discussions before creating this Discussion post.
+          required: true
+  - type: textarea
+    attributes:
+      label: Contents
+      description: Write your contents here
+    validations:
+      required: true

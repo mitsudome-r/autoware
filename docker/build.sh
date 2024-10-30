@@ -132,9 +132,12 @@ build_images() {
         --set "*.args.BASE_IMAGE=$base_image" \
         --set "*.args.SETUP_ARGS=$setup_args" \
         --set "*.args.LIB_DIR=$lib_dir" \
-        --set "base.tags=ghcr.io/autowarefoundation/autoware:base" \
-        --set "universe-devel.tags=ghcr.io/autowarefoundation/autoware:universe-devel$image_name_suffix" \
-        --set "universe.tags=ghcr.io/autowarefoundation/autoware:universe$image_name_suffix" \
+        --set "base.tags=ghcr.io/mitsudome-r/autoware:base" \
+        --set "universe-devel.tags=ghcr.io/mitsudome-r/autoware:universe-devel$image_name_suffix" \
+        --set "universe.tags=ghcr.io/mitsudome-r/autoware:universe$image_name_suffix" \
+        --set "universe-planning-control-devel.tags=ghcr.io/mitsudome-r/autoware:universe-planning-control-devel$image_name_suffix" \
+        --set "universe-localization-mapping-devel.tags=ghcr.io/mitsudome-r/autoware:universe-localization-mapping-devel$image_name_suffix" \
+        --set "universe-vehicle-system-devel.tags=ghcr.io/mitsudome-r/autoware:universe-vehicle-system-devel$image_name_suffix" \
         "${targets[@]}"
     set +x
 }

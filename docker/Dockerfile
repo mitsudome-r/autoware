@@ -236,6 +236,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -268,6 +269,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -300,6 +302,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -336,6 +339,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -379,6 +383,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -414,6 +419,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 
@@ -457,6 +463,7 @@ RUN --mount=type=cache,target=${CCACHE_DIR} \
     --merge-install \
     --install-base /opt/autoware \
     --mixin release compile-commands ccache \
+    --parallel-worker 2 \
   && du -sh ${CCACHE_DIR} && ccache -s \
   && rm -rf /autoware/build /autoware/log
 

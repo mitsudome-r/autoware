@@ -8,7 +8,7 @@ function build_and_clean() {
 
     # shellcheck disable=SC2086
     du -sh "$ccache_dir" && ccache -s &&
-        colcon build --cmake-args \
+        taskset -c 0-1 colcon build --cmake-args \
             " -Wno-dev" \
             " --no-warn-unused-cli" \
             --merge-install \

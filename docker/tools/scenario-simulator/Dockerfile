@@ -1,5 +1,5 @@
 ### Builder
-FROM ghcr.io/autowarefoundation/autoware:universe-devel AS builder
+FROM ghcr.io/autowarefoundation/autoware:universe-common-devel AS builder
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ENV CCACHE_DIR="/root/.ccache"
@@ -32,7 +32,7 @@ RUN source /opt/autoware/setup.bash \
     && cat /rosdep-simulator-exec-depend-packages.txt
 
 ### Scenario Simulator
-FROM ghcr.io/autowarefoundation/autoware:core AS scenario-simulator
+FROM ghcr.io/autowarefoundation/autoware:universe-common-devel AS scenario-simulator
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ARG ROS_DISTRO
 ARG LIB_DIR

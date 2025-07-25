@@ -171,7 +171,18 @@ build_images() {
         --set "universe-sensing-perception-cuda.tags=ghcr.io/autowarefoundation/autoware:universe-sensing-perception-cuda" \
         --set "universe-devel-cuda.tags=ghcr.io/autowarefoundation/autoware:universe-devel-cuda" \
         --set "universe-cuda.tags=ghcr.io/autowarefoundation/autoware:universe-cuda" \
-        "$target$image_name_suffix"
+        universe
+    docker buildx bake --load --progress=plain -f "$SCRIPT_DIR/tools/docker-bake.hcl" \
+        --set "*.context=$WORKSPACE_ROOT" \
+        --set "*.ssh=default" \
+        --set "*.platform=$platform" \
+        --set "*.args.ROS_DISTRO=$rosdistro" \
+        --set "*.args.AUTOWARE_BASE_IMAGE=$autoware_base_image" \
+        --set "*.args.AUTOWARE_BASE_CUDA_IMAGE=$autoware_base_cuda_image" \
+        --set "*.args.SETUP_ARGS=$setup_args" \
+        --set "*.args.LIB_DIR=$lib_dir" \
+        --set "scenario-simulator.tags=ghcr.io/autowarefoundation/autoware-tools:scenario-simulator" \
+        scenario-simulator
     set +x
 }
 
@@ -187,6 +198,6 @@ set_build_options
 set_platform
 set_arch_lib_dir
 load_env
-clone_repositories
+# clone_repositories
 build_images
 remove_dangling_images

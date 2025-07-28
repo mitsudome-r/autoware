@@ -83,7 +83,7 @@ jobs:
 
       - name: Fix path in sample-scenario.yaml
         run: |
-          sed -i "s@/home/user/sample-map-planning/@/autoware_map/sample-map-planning/@g" sample-scenario.yaml
+          sed -i "s@/home/user/autoware_map/sample-map-planning/@/autoware_map/sample-map-planning/@g" sample-scenario.yaml
         shell: bash
 
       - name: Launch scenario_test_runner with diagnostics

@@ -9,7 +9,6 @@ jobs:
       image: ghcr.io/autowarefoundation/autoware:universe-devel
       env:
         RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
-      options: --network=host
 
     steps:
       - name: Check out repository

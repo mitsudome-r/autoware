@@ -5,7 +5,12 @@ on:
 jobs:
   scenario-test:
     runs-on: ubuntu-24.04
-    container: ghcr.io/autowarefoundation/autoware:universe-devel
+    container:
+      image: ghcr.io/autowarefoundation/autoware:universe-devel
+      env:
+        RMW_IMPLEMENTATION: rmw_cyclonedds_cpp
+      options: --network=host
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

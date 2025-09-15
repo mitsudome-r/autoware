@@ -56,7 +56,7 @@ EOF
 
     # Start VNC server with Openbox
     echo "Starting VNC server with Openbox..."
-    vncserver :99 -geometry 1024x768 -depth 16 -pixelformat rgb565
+    vncserver :99 -geometry 1920x1080 -depth 16 -pixelformat rgb565
     VNC_RESULT=$?
 
     if [ $VNC_RESULT -ne 0 ]; then

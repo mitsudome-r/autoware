@@ -12,7 +12,7 @@ inputs:
     description: Additional build args.
     required: false
   max-parallelism:
-    default: 2
+    default: 1
     description: Maximum parallelism for buildkitd.
     required: false
 

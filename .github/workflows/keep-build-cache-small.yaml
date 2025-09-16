@@ -30,7 +30,7 @@ jobs:
         run: |
           echo "CACHE_THRESHOLD_GB=${{ matrix.cache_threshold_gb }}" >> "$GITHUB_ENV"
           echo "IMAGE_TAG=${{ matrix.image_tag }}" >> "$GITHUB_ENV"
-          echo "BUILD_CACHE_IMAGE=ghcr.io/autowarefoundation/${{ env.IMAGE_NAME }}:${{ matrix.image_tag }}" >> "$GITHUB_ENV"
+          echo "BUILD_CACHE_IMAGE=ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ matrix.image_tag }}" >> "$GITHUB_ENV"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3

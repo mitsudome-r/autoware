@@ -182,7 +182,8 @@ build_images() {
         --set "*.args.SETUP_ARGS=$setup_args" \
         --set "*.args.LIB_DIR=$lib_dir" \
         --set "scenario-simulator.tags=ghcr.io/autowarefoundation/autoware-tools:scenario-simulator" \
-        scenario-simulator
+        --set "visualizer.tags=ghcr.io/autowarefoundation/autoware-tools:visualizer" \
+        visualizer
     set +x
 }
 

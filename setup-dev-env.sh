@@ -171,22 +171,25 @@ if ! (command -v git >/dev/null 2>&1); then
     sudo apt-get -y install git
 fi
 
-# Install pip for ansible
+# # Install pip for ansible
 if ! (python3 -m pip --version >/dev/null 2>&1); then
     sudo apt-get -y update
     sudo apt-get -y install python3-pip python3-venv
 fi
 
+# python3 -m venv --system-site-packages /opt/autoware_venv
+# source /opt/autoware_venv/bin/activate
+
 # Install pipx for ansible
 if ! (python3 -m pipx --version >/dev/null 2>&1); then
     sudo apt-get -y update
-    python3 -m pip install --user pipx --break-system-packages
+    sudo apt-get -y install pipx
 fi
 
 # Install ansible
 python3 -m pipx ensurepath
 export PATH="${PIPX_BIN_DIR:=$HOME/.local/bin}:$PATH"
-pipx install --include-deps --force "ansible==6.*"
+pipx install --include-deps --force "ansible==10.*"
 
 # Install ansible collections
 echo -e "\e[36m"ansible-galaxy collection install -f -r "$SCRIPT_DIR/ansible-galaxy-requirements.yaml" "\e[m"

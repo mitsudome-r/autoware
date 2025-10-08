@@ -69,6 +69,10 @@ while [ "$1" != "" ]; do
         option_module="$2"
         shift
         ;;
+    --ros-distro)
+        option_ros_distro="$2"
+        shift
+        ;;
     *)
         args+=("$1")
         ;;
@@ -149,6 +153,11 @@ fi
 
 # Load env
 source "$SCRIPT_DIR/amd64.env"
+
+if [ "$option_ros_distro" = "jazzy" ]; then
+    source "$SCRIPT_DIR/amd64_jazzy.env"
+fi
+
 if [ "$(uname -m)" = "aarch64" ]; then
     source "$SCRIPT_DIR/arm64.env"
 fi

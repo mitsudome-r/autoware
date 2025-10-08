@@ -34,7 +34,7 @@ jobs:
           - platform: jazzy
             runner: ubuntu-24.04
             env-file: amd64_jazzy.env
-            suffix: -jazzy
+            suffix: "-jazzy"
             set-latest: false
     runs-on: ${{ matrix.runner }}
     steps:
@@ -54,7 +54,7 @@ jobs:
         uses: falti/dotenv-action@v1
         with:
           path: ${{ matrix.env-file }}
-          log-variables: tru
+          log-variables: true
 
       - name: Build Autoware's base images
         uses: ./.github/actions/docker-build-and-push-base

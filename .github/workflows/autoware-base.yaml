@@ -71,3 +71,5 @@ jobs:
             *.platform=linux/amd64
             *.args.ROS_DISTRO=jazzy
             *.args.BASE_IMAGE=ros:jazzy-ros-base-noble
+          suffix: -jazzy
+          set-latest: false

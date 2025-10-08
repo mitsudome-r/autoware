@@ -29,9 +29,13 @@ jobs:
           - platform: humble
             runner: ubuntu-22.04
             env-file: amd64.env
+            suffix: "" # no suffix for humble since it is default
+            set-latest: true
           - platform: jazzy
             runner: ubuntu-24.04
             env-file: amd64_jazzy.env
+            suffix: -jazzy
+            set-latest: false
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out this repository
@@ -60,7 +64,8 @@ jobs:
             *.platform=linux/amd64,linux/arm64
             *.args.ROS_DISTRO=${{ steps.load-env.outputs.rosdistro }}
             *.args.BASE_IMAGE=${{ steps.load-env.outputs.base_image }}
-
+          suffix: ${{ matrix.suffix }}
+          set-latest: ${{ matrix.set-latest }}
   # autoware-base-jazzy:
   #   needs: load-env
   #   runs-on: ubuntu-24.04

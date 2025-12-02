@@ -696,6 +696,8 @@ COPY --from=universe-devel /opt/autoware /opt/autoware
 COPY docker/etc/.bash_aliases /root/.bash_aliases
 RUN echo "source /opt/autoware/setup.bash" > /etc/bash.bashrc
 
+RUN ln -s /opt/autoware /autoware/install
+
 ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["/bin/bash"]
 

@@ -33,7 +33,6 @@ runs:
       run: |
         mkdir src
         vcs import --shallow src < autoware.repos
-        vcs import --shallow src < extra-packages.repos
       shell: bash
 
     - name: Import additional repositories

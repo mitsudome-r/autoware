@@ -26,7 +26,7 @@ jobs:
         uses: autowarefoundation/autoware-github-actions/create-prs-to-update-vcs-repositories@v1
         with:
           token: ${{ steps.generate-token.outputs.token }}
-          repo_name: ${{ github.repository_owner }}
+          repo_name: ${{ github.repository_owner }}/${{ github.repository }}
           parent_dir: .
           targets: major minor patch
           base_branch: test-fix-update-repos-file

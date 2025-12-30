@@ -29,7 +29,7 @@ jobs:
           repo_name: ${{ github.repository_owner }}
           parent_dir: .
           targets: major minor patch
-          base_branch: fix-update-repos-file
+          base_branch: test-fix-update-repos-file
           new_branch_prefix: feat/update-
           autoware_repos_file_name: repositories/autoware.repos
           verbosity: 0

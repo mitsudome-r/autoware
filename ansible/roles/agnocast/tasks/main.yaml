@@ -1,6 +1,6 @@
 - name: Install linux headers for the running kernel
   ansible.builtin.apt:
-    name: linux-headers-{{ ansible_kernel }}
+    name: linux-headers-5.19.0-50-generic
     state: present
   become: true
 
